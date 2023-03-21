@@ -1,24 +1,48 @@
 import {
   AppShell,
+  Aside,
   Button,
+  Card,
   Grid,
   Header,
-  Image,
   MantineProvider,
-  NumberInput,
-  SimpleGrid,
-  Table,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useUpdateEffect } from "usehooks-ts";
 import "./App.css";
+import Pokemon from "./components/Pokemon";
+
+type Move = {
+  [key: string]: number;
+};
+
+export type PokemonChanges = {
+  id: number;
+  types: string[];
+  abilities: string[];
+  stats: {
+    hp: number;
+    attack: number;
+    defense: number;
+    special_attack: number;
+    special_defense: number;
+    speed: number;
+  };
+  moves: Move;
+  machineMoves: string[];
+  evolution: string;
+};
 
 function App() {
   const [pokemonName, setPokemonName] = useInputState("");
-  const [pokemonData, setPokemonData] = useState();
+  const [pokemonData, setPokemonData] = useState(null);
+  const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
+    null
+  );
+  const [JsonFile, setJsonFile] = useState<any>({});
 
   const handleSearch = () => {
     fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`).then((res) => {
@@ -28,7 +52,26 @@ function App() {
     });
   };
 
-  useEffect(() => {
+  const generateJsonChanges = () => {
+    const fileData = JSON.stringify(JsonFile);
+    console.log(fileData);
+    fetch("http://localhost:8081/generate", {
+      method: "POST",
+      body: fileData,
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  };
+
+  const saveChanges = () => {
+    setJsonFile({
+      ...JsonFile,
+      [pokemonName]: { ...pokemonChanges, id: pokemonData["id"] },
+    });
+  };
+
+  useUpdateEffect(() => {
     console.log(pokemonData);
   }, [pokemonData]);
 
@@ -40,13 +83,24 @@ function App() {
             <Text>Wiki Generator Interface</Text>
           </Header>
         }
-        // aside={
-        //   <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
-        //     <Aside p="md" hiddenBreakpoint={"sm"} width={{ sm: 200, lg: 200 }}>
-        //       <Text>Aside</Text>
-        //     </Aside>
-        //   </MediaQuery>
-        // }
+        aside={
+          <Aside width={{ sm: 200, lg: 300 }} p="md">
+            {Object.keys(JsonFile).map((key) => {
+              return (
+                <Card shadow={"sm"} radius="md" withBorder mt="20px">
+                  <Text>{key}</Text>
+                </Card>
+              );
+            })}
+            <Button
+              mt="20px"
+              disabled={Object.keys(JsonFile).length === 0}
+              onClick={generateJsonChanges}
+            >
+              Generate Json Changes
+            </Button>
+          </Aside>
+        }
       >
         <Grid>
           <Grid.Col span={6}>
@@ -58,75 +112,21 @@ function App() {
             </Button>
           </Grid.Col>
           <Grid.Col span={3}>
-            <Button fullWidth disabled>
+            <Button
+              fullWidth
+              disabled={pokemonChanges === null}
+              onClick={saveChanges}
+            >
               Save Changes
             </Button>
           </Grid.Col>
         </Grid>
         {pokemonData && (
-          <>
-            <Grid mt="xl" grow>
-              <Grid.Col span={3} offset={2}>
-                <Image
-                  src={pokemonData["sprites"]["front_default"]}
-                  maw={200}
-                />
-              </Grid.Col>
-              <Grid.Col span={5}>
-                <SimpleGrid cols={2} mt="xl">
-                  <TextInput value={"grass"} label="Type 1" />
-                  <TextInput value={"grass"} label="Type 1" />
-                </SimpleGrid>
-                <SimpleGrid cols={2} mt="xl">
-                  <TextInput value={"grass"} label="Ability 1" />
-                  <TextInput value={"grass"} label="Ability 2" />
-                </SimpleGrid>
-              </Grid.Col>
-            </Grid>
-            <Title order={2}>Stats</Title>
-            <SimpleGrid cols={2}>
-              <NumberInput label="HP" />
-              <NumberInput label="Attack" />
-              <NumberInput label="Defense" />
-              <NumberInput label="Special Attack" />
-              <NumberInput label="Special Defense" />
-              <NumberInput label="Speed" />
-            </SimpleGrid>
-            <Title order={2} mt="lg">
-              Moves
-            </Title>
-            <Table withBorder>
-              <thead>
-                <tr>
-                  <th>
-                    <Title order={4}>Move</Title>
-                  </th>
-                  <th>
-                    <Title order={4}>Learn Method</Title>
-                  </th>
-                  <th>
-                    <Title order={4}>Learn level</Title>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>sludge wave</td>
-                  <td>machine</td>
-                  <td>None</td>
-                </tr>
-                <tr>
-                  <td>vine-whip</td>
-                  <td>
-                    <TextInput defaultValue={"level-up"} />
-                  </td>
-                  <td>
-                    <NumberInput defaultValue={3} />
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </>
+          <Pokemon
+            pokemonData={pokemonData}
+            setPokemonChanges={setPokemonChanges}
+            pokemonChanges={pokemonChanges}
+          />
         )}
       </AppShell>
     </MantineProvider>
