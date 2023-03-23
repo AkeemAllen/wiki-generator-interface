@@ -1,8 +1,6 @@
 import {
   AppShell,
-  Aside,
   Button,
-  Card,
   Grid,
   Header,
   MantineProvider,
@@ -14,61 +12,45 @@ import { useState } from "react";
 import { useUpdateEffect } from "usehooks-ts";
 import "./App.css";
 import Pokemon from "./components/Pokemon";
-
-type Move = {
-  [key: string]: number;
-};
-
-export type PokemonChanges = {
-  id: number;
-  types: string[];
-  abilities: string[];
-  stats: {
-    hp: number;
-    attack: number;
-    defense: number;
-    special_attack: number;
-    special_defense: number;
-    speed: number;
-  };
-  moves: Move;
-  machineMoves: string[];
-  evolution: string;
-};
+import { PokemonChanges, PokemonData } from "./constants";
 
 function App() {
-  const [pokemonName, setPokemonName] = useInputState("");
-  const [pokemonData, setPokemonData] = useState(null);
+  const [pokemonName, setPokemonName] = useInputState<string>("");
+  const [pokemonData, setPokemonData] = useState<PokemonData | null>(null);
   const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
     null
   );
   const [JsonFile, setJsonFile] = useState<any>({});
 
   const handleSearch = () => {
-    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`).then((res) => {
+    fetch(`http://localhost:8081/pokemon/${pokemonName}`).then((res) => {
       res.json().then((data) => {
         setPokemonData(data);
       });
     });
   };
 
-  const generateJsonChanges = () => {
-    const fileData = JSON.stringify(JsonFile);
-    console.log(fileData);
-    fetch("http://localhost:8081/generate", {
+  // const generateJsonChanges = () => {
+  //   const fileData = JSON.stringify(JsonFile);
+  //   console.log(fileData);
+  //   fetch("http://localhost:8081/generate", {
+  //     method: "POST",
+  //     body: fileData,
+  //     headers: { "Content-Type": "application/json" },
+  //   })
+  //     .then((res) => console.log(res))
+  //     .catch((err) => console.log(err));
+  // };
+
+  const saveChanges = () => {
+    console.log(pokemonChanges);
+    fetch(`http://localhost:8081/save-changes/${pokemonName}`, {
       method: "POST",
-      body: fileData,
+      body: JSON.stringify(pokemonChanges),
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
-  };
-
-  const saveChanges = () => {
-    setJsonFile({
-      ...JsonFile,
-      [pokemonName]: { ...pokemonChanges, id: pokemonData["id"] },
-    });
   };
 
   useUpdateEffect(() => {
@@ -83,24 +65,24 @@ function App() {
             <Text>Wiki Generator Interface</Text>
           </Header>
         }
-        aside={
-          <Aside width={{ sm: 200, lg: 300 }} p="md">
-            {Object.keys(JsonFile).map((key) => {
-              return (
-                <Card shadow={"sm"} radius="md" withBorder mt="20px">
-                  <Text>{key}</Text>
-                </Card>
-              );
-            })}
-            <Button
-              mt="20px"
-              disabled={Object.keys(JsonFile).length === 0}
-              onClick={generateJsonChanges}
-            >
-              Generate Json Changes
-            </Button>
-          </Aside>
-        }
+        // aside={
+        //   <Aside width={{ sm: 200, lg: 300 }} p="md">
+        //     {Object.keys(JsonFile).map((key) => {
+        //       return (
+        //         <Card shadow={"sm"} radius="md" withBorder mt="20px">
+        //           <Text>{key}</Text>
+        //         </Card>
+        //       );
+        //     })}
+        //     <Button
+        //       mt="20px"
+        //       disabled={Object.keys(JsonFile).length === 0}
+        //       onClick={generateJsonChanges}
+        //     >
+        //       Generate Json Changes
+        //     </Button>
+        //   </Aside>
+        // }
       >
         <Grid>
           <Grid.Col span={6}>

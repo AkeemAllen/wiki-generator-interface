@@ -10,22 +10,12 @@ import {
 import { useInputState } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useUpdateEffect } from "usehooks-ts";
-import { PokemonChanges } from "../App";
-import { Types } from "../constants";
+import { PokemonChanges, PokemonData, Stats, Types } from "../constants";
 
 type PokemonProps = {
-  pokemonData: any;
+  pokemonData: PokemonData;
   pokemonChanges: PokemonChanges | null;
   setPokemonChanges: any;
-};
-
-type Stats = {
-  hp: number;
-  attack: number;
-  defense: number;
-  special_attack: number;
-  special_defense: number;
-  speed: number;
 };
 
 const Pokemon = ({
@@ -65,29 +55,17 @@ const Pokemon = ({
   }, [stats]);
 
   useEffect(() => {
-    setTypeOne(
-      pokemonData["types"].map((type: any) => type["type"]["name"])[0]
-    );
-    setTypeTwo(
-      pokemonData["types"].map((type: any) => type["type"]["name"])[1]
-    );
-    setAbilityOne(
-      pokemonData["abilities"].map(
-        (ability: any) => ability["ability"]["name"]
-      )[0]
-    );
-    setAbilityTwo(
-      pokemonData["abilities"].map(
-        (ability: any) => ability["ability"]["name"]
-      )[1]
-    );
+    setTypeOne(pokemonData.types[0]);
+    setTypeTwo(pokemonData.types[1]);
+    setAbilityOne(pokemonData.abilities[0]);
+    setAbilityTwo(pokemonData.abilities[1]);
     setStats({
-      hp: pokemonData["stats"][0]["base_stat"],
-      attack: pokemonData["stats"][1]["base_stat"],
-      defense: pokemonData["stats"][2]["base_stat"],
-      special_attack: pokemonData["stats"][3]["base_stat"],
-      special_defense: pokemonData["stats"][4]["base_stat"],
-      speed: pokemonData["stats"][5]["base_stat"],
+      hp: pokemonData.stats.hp,
+      attack: pokemonData.stats.attack,
+      defense: pokemonData.stats.defense,
+      sp_attack: pokemonData.stats.sp_attack,
+      sp_defense: pokemonData.stats.sp_defense,
+      speed: pokemonData.stats.speed,
     });
   }, [pokemonData]);
 
@@ -95,7 +73,7 @@ const Pokemon = ({
     <>
       <Grid mt="xl" grow>
         <Grid.Col span={3} offset={2}>
-          <Image src={pokemonData["sprites"]["front_default"]} maw={200} />
+          <Image src={pokemonData.sprite} maw={200} />
         </Grid.Col>
         <Grid.Col span={5}>
           <SimpleGrid cols={2} mt="xl">
@@ -145,12 +123,12 @@ const Pokemon = ({
         />
         <NumberInput
           label="Special Attack"
-          value={stats.special_attack}
+          value={stats.sp_attack}
           onChange={(e: number) => handleStatsChange(e, "special_attack")}
         />
         <NumberInput
           label="Special Defense"
-          value={stats.special_defense}
+          value={stats.sp_defense}
           onChange={(e: number) => handleStatsChange(e, "special_defense")}
         />
         <NumberInput
