@@ -1,4 +1,5 @@
 export const Types = {
+  NONE: "None",
   GRASS: "grass",
   FIRE: "fire",
   WATER: "water",
