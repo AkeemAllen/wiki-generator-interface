@@ -10,7 +10,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import { Move } from "../types";
 
 type MovesTableProps = {
@@ -21,6 +21,8 @@ type MovesTableProps = {
 const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [newMove, setNewMove] = useInputState<string>("");
+  const [searchTerm, setSearchTerm] = useInputState<string>("");
+  //   const [filteredMoveMethod, setFilteredMoveMethod] = useInputState<string>("");
 
   const handleMethodMoveChange = (method: string, move_name: string) => {
     setMoves((moves: Move) => {
@@ -49,11 +51,11 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
   const addNewMove = (move_name: string) => {
     setMoves((moves: Move) => {
       return {
-        ...moves,
         [move_name]: {
           level_learned_at: 1,
           learn_method: "level-up",
         },
+        ...moves,
       };
     });
     close();
@@ -74,8 +76,13 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
 
   return (
     <>
-      <SimpleGrid cols={2} mt="50px">
+      <SimpleGrid cols={3} mt="50px">
         <Title order={2}>Moves</Title>
+        <TextInput
+          icon={<IconSearch size={"1rem"} />}
+          placeholder="Search Moves"
+          onChange={setSearchTerm}
+        />
         <Box w={200}>
           <Button leftIcon={<IconPlus size={"1rem"} />} onClick={open}>
             Add Move
@@ -100,6 +107,7 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
         <tbody>
           {Object.keys(moves)
             .filter((key: string) => moves[key].delete !== true)
+            .filter((key: string) => key.includes(searchTerm))
             .map((key: string, index: number) => {
               return (
                 <tr key={index}>
