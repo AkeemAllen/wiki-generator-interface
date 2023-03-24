@@ -2,15 +2,16 @@ import {
   Grid,
   Image,
   NativeSelect,
-  NumberInput,
   SimpleGrid,
   TextInput,
-  Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useUpdateEffect } from "usehooks-ts";
-import { PokemonChanges, PokemonData, Stats, Types } from "../constants";
+import { Types } from "../constants";
+import { Move, PokemonChanges, PokemonData, Stats } from "../types";
+import MovesTable from "./MovesTable";
+import StatsInputs from "./StatsInputs";
 
 type PokemonProps = {
   pokemonData: PokemonData;
@@ -27,11 +28,8 @@ const Pokemon = ({
   const [typeTwo, setTypeTwo] = useInputState<string>("");
   const [abilityOne, setAbilityOne] = useInputState<string>("");
   const [abilityTwo, setAbilityTwo] = useInputState<string>("");
+  const [moves, setMoves] = useState<Move>({} as Move);
   const [stats, setStats] = useState<Stats>({} as Stats);
-
-  const handleStatsChange = (value: number, stat: string) => {
-    setStats({ ...stats, [stat]: value });
-  };
 
   useUpdateEffect(() => {
     setPokemonChanges({
@@ -54,11 +52,19 @@ const Pokemon = ({
     });
   }, [stats]);
 
+  useUpdateEffect(() => {
+    setPokemonChanges({
+      ...pokemonChanges,
+      moves: moves,
+    });
+  }, [moves]);
+
   useEffect(() => {
     setTypeOne(pokemonData.types[0]);
     setTypeTwo(pokemonData.types[1]);
     setAbilityOne(pokemonData.abilities[0]);
     setAbilityTwo(pokemonData.abilities[1]);
+    setMoves(pokemonData.moves);
     setStats({
       hp: pokemonData.stats.hp,
       attack: pokemonData.stats.attack,
@@ -87,7 +93,7 @@ const Pokemon = ({
               label={`Type 2`}
               value={typeTwo}
               onChange={setTypeTwo}
-              data={Object.keys(Types).map((key) => Types[key])}
+              data={Object.keys(Types).map((key: string) => Types[key])}
             />
           </SimpleGrid>
           <SimpleGrid cols={2} mt="xl">
@@ -104,73 +110,8 @@ const Pokemon = ({
           </SimpleGrid>
         </Grid.Col>
       </Grid>
-      <Title order={2}>Stats</Title>
-      <SimpleGrid cols={2}>
-        <NumberInput
-          label="HP"
-          value={stats.hp}
-          onChange={(e: number) => handleStatsChange(e, "hp")}
-        />
-        <NumberInput
-          label="Attack"
-          value={stats.attack}
-          onChange={(e: number) => handleStatsChange(e, "attack")}
-        />
-        <NumberInput
-          label="Defense"
-          value={stats.defense}
-          onChange={(e: number) => handleStatsChange(e, "defense")}
-        />
-        <NumberInput
-          label="Special Attack"
-          value={stats.sp_attack}
-          onChange={(e: number) => handleStatsChange(e, "special_attack")}
-        />
-        <NumberInput
-          label="Special Defense"
-          value={stats.sp_defense}
-          onChange={(e: number) => handleStatsChange(e, "special_defense")}
-        />
-        <NumberInput
-          label="Speed"
-          value={stats.speed}
-          onChange={(e: number) => handleStatsChange(e, "speed")}
-        />
-      </SimpleGrid>
-      {/* <Title order={2} mt="lg">
-        Moves
-      </Title>
-      <Table withBorder>
-        <thead>
-          <tr>
-            <th>
-              <Title order={4}>Move</Title>
-            </th>
-            <th>
-              <Title order={4}>Learn Method</Title>
-            </th>
-            <th>
-              <Title order={4}>Learn level</Title>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>sludge wave</td>
-            <td>machine</td>
-            <td>None</td>
-          </tr>
-          <tr>
-            <td>vine-whip</td>
-            <td>
-              <TextInput defaultValue={"level-up"} />
-            </td>
-            <td>
-              <NumberInput defaultValue={3} />
-            </td>
-          </tr>
-        </tbody>
-      </Table> */}
+      <StatsInputs setStats={setStats} stats={stats} />
+      <MovesTable moves={moves} setMoves={setMoves} />
     </>
   );
 };

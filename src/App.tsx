@@ -9,10 +9,9 @@ import {
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { useState } from "react";
-import { useUpdateEffect } from "usehooks-ts";
 import "./App.css";
 import Pokemon from "./components/Pokemon";
-import { PokemonChanges, PokemonData } from "./constants";
+import { PokemonChanges, PokemonData } from "./types";
 
 function App() {
   const [pokemonName, setPokemonName] = useInputState<string>("");
@@ -20,7 +19,6 @@ function App() {
   const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
     null
   );
-  const [JsonFile, setJsonFile] = useState<any>({});
 
   const handleSearch = () => {
     fetch(`http://localhost:8081/pokemon/${pokemonName}`).then((res) => {
@@ -29,18 +27,6 @@ function App() {
       });
     });
   };
-
-  // const generateJsonChanges = () => {
-  //   const fileData = JSON.stringify(JsonFile);
-  //   console.log(fileData);
-  //   fetch("http://localhost:8081/generate", {
-  //     method: "POST",
-  //     body: fileData,
-  //     headers: { "Content-Type": "application/json" },
-  //   })
-  //     .then((res) => console.log(res))
-  //     .catch((err) => console.log(err));
-  // };
 
   const saveChanges = () => {
     console.log(pokemonChanges);
@@ -52,10 +38,6 @@ function App() {
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
   };
-
-  useUpdateEffect(() => {
-    console.log(pokemonData);
-  }, [pokemonData]);
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
