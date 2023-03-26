@@ -1,97 +1,65 @@
 import {
   AppShell,
-  Button,
-  Grid,
+  Burger,
   Header,
   MantineProvider,
+  MediaQuery,
+  Navbar,
   Text,
-  TextInput,
 } from "@mantine/core";
-import { useInputState } from "@mantine/hooks";
+import { IconBallBasketball, IconDisc } from "@tabler/icons-react";
 import { useState } from "react";
 import "./App.css";
-import Pokemon from "./components/Pokemon";
-import { PokemonChanges, PokemonData } from "./types";
+import NavButton from "./components/NavButton";
+import Moves from "./pages/Moves";
+import Pokemon from "./pages/Pokemon";
 
 function App() {
-  const [pokemonName, setPokemonName] = useInputState<string>("");
-  const [pokemonData, setPokemonData] = useState<PokemonData | null>(null);
-  const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
-    null
-  );
-
-  const handleSearch = () => {
-    fetch(`http://localhost:8081/pokemon/${pokemonName}`).then((res) => {
-      res.json().then((data) => {
-        setPokemonData(data);
-      });
-    });
-  };
-
-  const saveChanges = () => {
-    console.log(pokemonChanges);
-    fetch(`http://localhost:8081/save-changes/${pokemonName}`, {
-      method: "POST",
-      body: JSON.stringify(pokemonChanges),
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-  };
+  const [navBarOpened, setNavBarOpened] = useState(false);
+  const [currentPage, setCurrentPage] = useState("pokemon");
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <AppShell
         header={
           <Header height={{ base: 70 }} p="xl">
+            <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+              <Burger
+                opened={navBarOpened}
+                onClick={() => setNavBarOpened((o) => !o)}
+                size="sm"
+                mr="xl"
+              />
+            </MediaQuery>
             <Text>Wiki Generator Interface</Text>
           </Header>
         }
-        // aside={
-        //   <Aside width={{ sm: 200, lg: 300 }} p="md">
-        //     {Object.keys(JsonFile).map((key) => {
-        //       return (
-        //         <Card shadow={"sm"} radius="md" withBorder mt="20px">
-        //           <Text>{key}</Text>
-        //         </Card>
-        //       );
-        //     })}
-        //     <Button
-        //       mt="20px"
-        //       disabled={Object.keys(JsonFile).length === 0}
-        //       onClick={generateJsonChanges}
-        //     >
-        //       Generate Json Changes
-        //     </Button>
-        //   </Aside>
-        // }
+        navbarOffsetBreakpoint="sm"
+        navbar={
+          <Navbar
+            p="md"
+            hiddenBreakpoint="sm"
+            hidden={!navBarOpened}
+            width={{ sm: 200, lg: 300 }}
+          >
+            <NavButton
+              text="Pokemon"
+              color="blue"
+              icon={<IconBallBasketball size={"1rem"} />}
+              onClick={() => setCurrentPage("pokemon")}
+            />
+
+            <NavButton
+              text="Moves"
+              color="teal"
+              icon={<IconDisc size={"1rem"} />}
+              onClick={() => setCurrentPage("moves")}
+            />
+          </Navbar>
+        }
       >
-        <Grid>
-          <Grid.Col span={6}>
-            <TextInput placeholder="Pokemon Name" onChange={setPokemonName} />
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Button fullWidth onClick={handleSearch}>
-              Search
-            </Button>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Button
-              fullWidth
-              disabled={pokemonChanges === null}
-              onClick={saveChanges}
-            >
-              Save Changes
-            </Button>
-          </Grid.Col>
-        </Grid>
-        {pokemonData && (
-          <Pokemon
-            pokemonData={pokemonData}
-            setPokemonChanges={setPokemonChanges}
-            pokemonChanges={pokemonChanges}
-          />
-        )}
+        {currentPage === "pokemon" && <Pokemon />}
+        {currentPage === "moves" && <Moves />}
       </AppShell>
     </MantineProvider>
   );

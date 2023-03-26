@@ -1,3 +1,11 @@
+export type MoveDetails = {
+  accuracy: number;
+  pp: number;
+  power: number;
+  type: string;
+  damage_class: string;
+};
+
 export type Move = {
   [key: string]: {
     level_learned_at: number;
