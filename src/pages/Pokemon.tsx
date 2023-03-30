@@ -13,6 +13,10 @@ const Pokemon = () => {
   const handleSearch = () => {
     fetch(`http://localhost:8081/pokemon/${pokemonName}`).then((res) => {
       res.json().then((data) => {
+        if (data.status === 404) {
+          alert(`${pokemonName} not found`);
+          return;
+        }
         setPokemonData(data);
       });
     });
@@ -20,11 +24,14 @@ const Pokemon = () => {
 
   const saveChanges = () => {
     console.log(pokemonChanges);
-    fetch(`http://localhost:8081/save-changes/pokemon/${pokemonName}`, {
-      method: "POST",
-      body: JSON.stringify(pokemonChanges),
-      headers: { "Content-Type": "application/json" },
-    })
+    fetch(
+      `http://localhost:8081/save-changes/pokemon/blaze-black-wiki/${pokemonName}`,
+      {
+        method: "POST",
+        body: JSON.stringify(pokemonChanges),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
   };

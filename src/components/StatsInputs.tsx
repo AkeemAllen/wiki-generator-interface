@@ -13,7 +13,9 @@ const StatsInputs = ({ stats, setStats }: StatsInputProps) => {
 
   return (
     <>
-      <Title order={2}>Stats</Title>
+      <Title order={2} mt="50px">
+        Stats
+      </Title>
       <SimpleGrid cols={2}>
         <NumberInput
           label="HP"

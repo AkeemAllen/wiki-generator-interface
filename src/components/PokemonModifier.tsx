@@ -1,9 +1,11 @@
 import {
+  Box,
   Grid,
   Image,
   NativeSelect,
   SimpleGrid,
   TextInput,
+  Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { useEffect, useState } from "react";
@@ -28,6 +30,7 @@ const Pokemon = ({
   const [typeTwo, setTypeTwo] = useInputState<string>("");
   const [abilityOne, setAbilityOne] = useInputState<string>("");
   const [abilityTwo, setAbilityTwo] = useInputState<string>("");
+  const [evolution, setEvolution] = useInputState<string>("");
   const [moves, setMoves] = useState<Move>({} as Move);
   const [stats, setStats] = useState<Stats>({} as Stats);
 
@@ -59,6 +62,13 @@ const Pokemon = ({
     });
   }, [moves]);
 
+  useUpdateEffect(() => {
+    setPokemonChanges({
+      ...pokemonChanges,
+      evolution: evolution,
+    });
+  }, [evolution]);
+
   useEffect(() => {
     setTypeOne(pokemonData.types[0]);
     setTypeTwo(
@@ -67,6 +77,7 @@ const Pokemon = ({
     setAbilityOne(pokemonData.abilities[0]);
     setAbilityTwo(pokemonData.abilities[1]);
     setMoves(pokemonData.moves);
+    setEvolution(pokemonData.evolution ? pokemonData.evolution : "");
     setStats({
       hp: pokemonData.stats.hp,
       attack: pokemonData.stats.attack,
@@ -112,6 +123,15 @@ const Pokemon = ({
           </SimpleGrid>
         </Grid.Col>
       </Grid>
+      <Title order={2}>Evolution Change</Title>
+      <Box sx={{ width: 500 }}>
+        <TextInput
+          mt="lg"
+          placeholder="Write a sentence about evolution change here"
+          onChange={setEvolution}
+          value={evolution}
+        />
+      </Box>
       <StatsInputs setStats={setStats} stats={stats} />
       <MovesTable moves={moves} setMoves={setMoves} />
     </>

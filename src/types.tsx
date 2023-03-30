@@ -41,4 +41,5 @@ export type PokemonData = {
   stats: Stats;
   moves: Move;
   sprite: string;
+  evolution?: string;
 };
