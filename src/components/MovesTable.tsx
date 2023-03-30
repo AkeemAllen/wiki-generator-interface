@@ -10,7 +10,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
-import { IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { Move } from "../types";
 
@@ -27,6 +27,11 @@ type NewMove = {
 
 const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [
+    editMoveModalOpened,
+    { open: openEditMoveModal, close: closeEditMoveModal },
+  ] = useDisclosure(false);
+  const [moveToEdit, setMoveToEdit] = useState<string>("");
   const [newMove, setNewMove] = useState<NewMove>({
     move_name: "",
     level_learned_at: 0,
@@ -117,6 +122,7 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
               <Title order={4}>Learn level</Title>
             </th>
             <th />
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -124,35 +130,28 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
             .filter((key: string) => moves[key].delete !== true)
             .filter((key: string) => key.includes(searchTerm))
             .map((key: string, index: number) => {
-              {
-                console.log(key);
-              }
               return (
                 <tr key={index}>
                   <td>{key}</td>
-                  <td>
-                    <NativeSelect
-                      value={moves[key].learn_method}
-                      onChange={(e) =>
-                        handleMethodMoveChange(e.target.value, key)
-                      }
-                      data={["level-up", "machine", "egg", "tutor"]}
-                    />
-                  </td>
-                  <td>
-                    <NumberInput
-                      value={moves[key].level_learned_at}
-                      min={0}
-                      max={100}
-                      onChange={(e: number) => handleLevelMoveChange(e, key)}
-                    />
-                  </td>
+                  <td>{moves[key].learn_method}</td>
+                  <td>{moves[key].level_learned_at}</td>
                   <td>
                     <Button
                       leftIcon={<IconTrash size={"1rem"} />}
                       onClick={() => deleteMove(key)}
                     >
                       Delete
+                    </Button>
+                  </td>
+                  <td>
+                    <Button
+                      leftIcon={<IconEdit size={"1rem"} />}
+                      onClick={() => {
+                        openEditMoveModal();
+                        setMoveToEdit(key);
+                      }}
+                    >
+                      Edit
                     </Button>
                   </td>
                 </tr>
@@ -189,6 +188,31 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
           />
         )}
         <Button onClick={() => addNewMove(newMove.move_name)}>Save</Button>
+      </Modal>
+      <Modal
+        opened={editMoveModalOpened}
+        onClose={closeEditMoveModal}
+        title={"Edit Move"}
+        centered
+      >
+        <TextInput value={moveToEdit} disabled label="Move Name" />
+        <NativeSelect
+          mt="lg"
+          mb="lg"
+          label="Learn Method"
+          value={moves[moveToEdit]?.learn_method}
+          onChange={(e) => handleMethodMoveChange(e.target.value, moveToEdit)}
+          data={["level-up", "machine", "egg", "tutor"]}
+        />
+        {moves[moveToEdit]?.learn_method === "level-up" && (
+          <NumberInput
+            mb="lg"
+            label="Level"
+            value={moves[moveToEdit]?.level_learned_at}
+            onChange={(e: number) => handleLevelMoveChange(e, moveToEdit)}
+          />
+        )}
+        <Button onClick={closeEditMoveModal}>Close</Button>
       </Modal>
     </>
   );

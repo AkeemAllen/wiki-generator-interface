@@ -1,12 +1,11 @@
 import { Button, Grid, TextInput } from "@mantine/core";
-import { useInputState } from "@mantine/hooks";
 import { useState } from "react";
 import { useSnackbar } from "react-simple-snackbar";
 import PokemonModifier from "../components/PokemonModifier";
 import { PokemonChanges, PokemonData } from "../types";
 
 const Pokemon = () => {
-  const [pokemonName, setPokemonName] = useInputState<string>("");
+  const [pokemonName, setPokemonName] = useState<string>("");
   const [pokemonData, setPokemonData] = useState<PokemonData | null>(null);
   const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
     null
@@ -47,7 +46,10 @@ const Pokemon = () => {
     <>
       <Grid>
         <Grid.Col span={6}>
-          <TextInput placeholder="Pokemon Name" onChange={setPokemonName} />
+          <TextInput
+            placeholder="Pokemon Name"
+            onChange={(e) => setPokemonName(e.target.value)}
+          />
         </Grid.Col>
         <Grid.Col span={3}>
           <Button fullWidth onClick={handleSearch}>
