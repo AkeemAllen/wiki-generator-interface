@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
+import { useState } from "react";
 import { Move } from "../types";
 
 type MovesTableProps = {
@@ -18,9 +19,19 @@ type MovesTableProps = {
   setMoves: any;
 };
 
+type NewMove = {
+  move_name: string;
+  level_learned_at: number;
+  learn_method: string;
+};
+
 const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [newMove, setNewMove] = useInputState<string>("");
+  const [newMove, setNewMove] = useState<NewMove>({
+    move_name: "",
+    level_learned_at: 0,
+    learn_method: "machine",
+  } as NewMove);
   const [searchTerm, setSearchTerm] = useInputState<string>("");
   //   const [filteredMoveMethod, setFilteredMoveMethod] = useInputState<string>("");
 
@@ -52,14 +63,18 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
     setMoves((moves: Move) => {
       return {
         [move_name]: {
-          level_learned_at: 1,
-          learn_method: "level-up",
+          level_learned_at: newMove.level_learned_at,
+          learn_method: newMove.learn_method,
         },
         ...moves,
       };
     });
     close();
-    setNewMove("");
+    setNewMove({
+      move_name: "",
+      level_learned_at: 0,
+      learn_method: "machine",
+    } as NewMove);
   };
 
   const deleteMove = (move_name: string) => {
@@ -109,12 +124,15 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
             .filter((key: string) => moves[key].delete !== true)
             .filter((key: string) => key.includes(searchTerm))
             .map((key: string, index: number) => {
+              {
+                console.log(key);
+              }
               return (
                 <tr key={index}>
                   <td>{key}</td>
                   <td>
                     <NativeSelect
-                      defaultValue={moves[key].learn_method}
+                      value={moves[key].learn_method}
                       onChange={(e) =>
                         handleMethodMoveChange(e.target.value, key)
                       }
@@ -123,7 +141,7 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
                   </td>
                   <td>
                     <NumberInput
-                      defaultValue={moves[key].level_learned_at}
+                      value={moves[key].level_learned_at}
                       min={0}
                       max={100}
                       onChange={(e: number) => handleLevelMoveChange(e, key)}
@@ -142,9 +160,35 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
             })}
         </tbody>
       </Table>
-      <Modal opened={opened} onClose={close} title={"New Move"} centered>
-        <TextInput onChange={setNewMove} />
-        <Button onClick={() => addNewMove(newMove)}>Save</Button>
+      <Modal opened={opened} onClose={close} title={"Add New Move"} centered>
+        <TextInput
+          value={newMove.move_name}
+          onChange={(e) =>
+            setNewMove({ ...newMove, move_name: e.target.value })
+          }
+          label="New Move"
+        />
+        <NativeSelect
+          mt="lg"
+          mb="lg"
+          label="Learn Method"
+          defaultValue={newMove.learn_method}
+          onChange={(e) =>
+            setNewMove({ ...newMove, learn_method: e.target.value })
+          }
+          data={["level-up", "machine", "egg", "tutor"]}
+        />
+        {newMove.learn_method === "level-up" && (
+          <NumberInput
+            mb="lg"
+            label="Level"
+            value={newMove.level_learned_at}
+            onChange={(e: number) =>
+              setNewMove({ ...newMove, level_learned_at: e })
+            }
+          />
+        )}
+        <Button onClick={() => addNewMove(newMove.move_name)}>Save</Button>
       </Modal>
     </>
   );

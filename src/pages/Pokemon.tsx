@@ -1,6 +1,7 @@
 import { Button, Grid, TextInput } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { useState } from "react";
+import { useSnackbar } from "react-simple-snackbar";
 import PokemonModifier from "../components/PokemonModifier";
 import { PokemonChanges, PokemonData } from "../types";
 
@@ -10,6 +11,10 @@ const Pokemon = () => {
   const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
     null
   );
+  const [openSnackbar, closeSnackbar] = useSnackbar({
+    position: "bottom-center",
+  });
+
   const handleSearch = () => {
     fetch(`http://localhost:8081/pokemon/${pokemonName}`).then((res) => {
       res.json().then((data) => {
@@ -24,15 +29,18 @@ const Pokemon = () => {
 
   const saveChanges = () => {
     console.log(pokemonChanges);
-    fetch(
-      `http://localhost:8081/save-changes/pokemon/blaze-black-wiki/${pokemonName}`,
-      {
-        method: "POST",
-        body: JSON.stringify(pokemonChanges),
-        headers: { "Content-Type": "application/json" },
-      }
-    )
-      .then((res) => console.log(res))
+    fetch(`http://localhost:8081/save-changes/pokemon/${pokemonName}`, {
+      method: "POST",
+      body: JSON.stringify(pokemonChanges),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          openSnackbar("Changes saved successfully");
+        } else {
+          openSnackbar("Error saving changes");
+        }
+      })
       .catch((err) => console.log(err));
   };
   return (

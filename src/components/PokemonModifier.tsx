@@ -75,7 +75,9 @@ const Pokemon = ({
       pokemonData.types[1] === undefined ? Types.NONE : pokemonData.types[1]
     );
     setAbilityOne(pokemonData.abilities[0]);
-    setAbilityTwo(pokemonData.abilities[1]);
+    setAbilityTwo(
+      pokemonData.abilities[1] === undefined ? "" : pokemonData.abilities[1]
+    );
     setMoves(pokemonData.moves);
     setEvolution(pokemonData.evolution ? pokemonData.evolution : "");
     setStats({

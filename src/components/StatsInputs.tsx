@@ -35,12 +35,12 @@ const StatsInputs = ({ stats, setStats }: StatsInputProps) => {
         <NumberInput
           label="Special Attack"
           value={stats.sp_attack}
-          onChange={(e: number) => handleStatsChange(e, "special_attack")}
+          onChange={(e: number) => handleStatsChange(e, "sp_attack")}
         />
         <NumberInput
           label="Special Defense"
           value={stats.sp_defense}
-          onChange={(e: number) => handleStatsChange(e, "special_defense")}
+          onChange={(e: number) => handleStatsChange(e, "sp_defense")}
         />
         <NumberInput
           label="Speed"
