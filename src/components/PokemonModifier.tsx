@@ -8,7 +8,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUpdateEffect } from "usehooks-ts";
 import { Types } from "../constants";
 import { Move, PokemonChanges, PokemonData, Stats } from "../types";
@@ -26,13 +26,28 @@ const Pokemon = ({
   pokemonChanges,
   setPokemonChanges,
 }: PokemonProps) => {
-  const [typeOne, setTypeOne] = useInputState<string>("");
-  const [typeTwo, setTypeTwo] = useInputState<string>("");
-  const [abilityOne, setAbilityOne] = useInputState<string>("");
-  const [abilityTwo, setAbilityTwo] = useInputState<string>("");
-  const [evolution, setEvolution] = useInputState<string>("");
-  const [moves, setMoves] = useState<Move>({} as Move);
-  const [stats, setStats] = useState<Stats>({} as Stats);
+  const [typeOne, setTypeOne] = useInputState<string>(pokemonData.types[0]);
+  const [typeTwo, setTypeTwo] = useInputState<string>(
+    pokemonData.types[1] === undefined ? Types.NONE : pokemonData.types[1]
+  );
+  const [abilityOne, setAbilityOne] = useInputState<string>(
+    pokemonData.abilities[0]
+  );
+  const [abilityTwo, setAbilityTwo] = useInputState<string>(
+    pokemonData.abilities[1] === undefined ? "" : pokemonData.abilities[1]
+  );
+  const [evolution, setEvolution] = useInputState<string>(
+    pokemonData.evolution ? pokemonData.evolution : ""
+  );
+  const [moves, setMoves] = useState<Move>(pokemonData.moves);
+  const [stats, setStats] = useState<Stats>({
+    hp: pokemonData.stats.hp,
+    attack: pokemonData.stats.attack,
+    defense: pokemonData.stats.defense,
+    sp_attack: pokemonData.stats.sp_attack,
+    sp_defense: pokemonData.stats.sp_defense,
+    speed: pokemonData.stats.speed,
+  });
 
   useUpdateEffect(() => {
     setPokemonChanges({
@@ -49,6 +64,15 @@ const Pokemon = ({
   }, [abilityOne, abilityTwo]);
 
   useUpdateEffect(() => {
+    console.log("moves changed");
+    setPokemonChanges({
+      ...pokemonChanges,
+      moves: moves,
+    });
+  }, [moves]);
+
+  useUpdateEffect(() => {
+    console.log("stats changed");
     setPokemonChanges({
       ...pokemonChanges,
       stats: stats,
@@ -58,37 +82,9 @@ const Pokemon = ({
   useUpdateEffect(() => {
     setPokemonChanges({
       ...pokemonChanges,
-      moves: moves,
-    });
-  }, [moves]);
-
-  useUpdateEffect(() => {
-    setPokemonChanges({
-      ...pokemonChanges,
       evolution: evolution,
     });
   }, [evolution]);
-
-  useEffect(() => {
-    setTypeOne(pokemonData.types[0]);
-    setTypeTwo(
-      pokemonData.types[1] === undefined ? Types.NONE : pokemonData.types[1]
-    );
-    setAbilityOne(pokemonData.abilities[0]);
-    setAbilityTwo(
-      pokemonData.abilities[1] === undefined ? "" : pokemonData.abilities[1]
-    );
-    setMoves(pokemonData.moves);
-    setEvolution(pokemonData.evolution ? pokemonData.evolution : "");
-    setStats({
-      hp: pokemonData.stats.hp,
-      attack: pokemonData.stats.attack,
-      defense: pokemonData.stats.defense,
-      sp_attack: pokemonData.stats.sp_attack,
-      sp_defense: pokemonData.stats.sp_defense,
-      speed: pokemonData.stats.speed,
-    });
-  }, [pokemonData]);
 
   return (
     <>

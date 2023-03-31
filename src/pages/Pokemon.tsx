@@ -10,11 +10,15 @@ const Pokemon = () => {
   const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
     null
   );
-  const [openSnackbar, closeSnackbar] = useSnackbar({
+  const [openSnackbar] = useSnackbar({
     position: "bottom-center",
   });
 
   const handleSearch = () => {
+    // ideally this should utilize isLoading, data and error states
+    // to help rerender the PokemonModifier component
+    // but for now settting pokemonData to null will do
+    setPokemonData(null);
     fetch(`http://localhost:8081/pokemon/${pokemonName}`).then((res) => {
       res.json().then((data) => {
         if (data.status === 404) {
@@ -36,6 +40,7 @@ const Pokemon = () => {
       .then((res) => {
         if (res.status === 200) {
           openSnackbar("Changes saved successfully");
+          setPokemonChanges(null);
         } else {
           openSnackbar("Error saving changes");
         }
