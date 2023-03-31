@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Modal,
@@ -12,6 +13,7 @@ import {
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+import { useFetch } from "usehooks-ts";
 import { Move } from "../types";
 
 type MovesTableProps = {
@@ -38,7 +40,9 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
     learn_method: "machine",
   } as NewMove);
   const [searchTerm, setSearchTerm] = useInputState<string>("");
-  //   const [filteredMoveMethod, setFilteredMoveMethod] = useInputState<string>("");
+  const { data: moveList, error: moveListError } = useFetch<string[]>(
+    "http://localhost:8081/moves"
+  );
 
   const handleMethodMoveChange = (method: string, move_name: string) => {
     setMoves((moves: Move) => {
@@ -160,11 +164,10 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
         </tbody>
       </Table>
       <Modal opened={opened} onClose={close} title={"Add New Move"} centered>
-        <TextInput
+        <Autocomplete
           value={newMove.move_name}
-          onChange={(e) =>
-            setNewMove({ ...newMove, move_name: e.target.value })
-          }
+          onChange={(value) => setNewMove({ ...newMove, move_name: value })}
+          data={moveList === undefined ? [] : moveList}
           label="New Move"
         />
         <NativeSelect

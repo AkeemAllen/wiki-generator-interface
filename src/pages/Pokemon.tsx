@@ -1,6 +1,7 @@
-import { Button, Grid, TextInput } from "@mantine/core";
+import { Autocomplete, Button, Grid } from "@mantine/core";
 import { useState } from "react";
 import { useSnackbar } from "react-simple-snackbar";
+import { useFetch } from "usehooks-ts";
 import PokemonModifier from "../components/PokemonModifier";
 import { PokemonChanges, PokemonData } from "../types";
 
@@ -13,6 +14,9 @@ const Pokemon = () => {
   const [openSnackbar] = useSnackbar({
     position: "bottom-center",
   });
+  const { data: pokemonList, error: pokemonListError } = useFetch<string[]>(
+    "http://localhost:8081/pokemon"
+  );
 
   const handleSearch = () => {
     // ideally this should utilize isLoading, data and error states
@@ -51,9 +55,10 @@ const Pokemon = () => {
     <>
       <Grid>
         <Grid.Col span={6}>
-          <TextInput
+          <Autocomplete
             placeholder="Pokemon Name"
-            onChange={(e) => setPokemonName(e.target.value)}
+            onChange={(value) => setPokemonName(value)}
+            data={pokemonList === undefined ? [] : pokemonList}
           />
         </Grid.Col>
         <Grid.Col span={3}>
