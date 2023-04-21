@@ -43,3 +43,33 @@ export type PokemonData = {
   sprite: string;
   evolution?: string;
 };
+
+export type TrainerOrWildPokemon = {
+  id?: number;
+  name?: string;
+  level?: number;
+  moves?: string[];
+  item?: string;
+  nature?: string;
+  ability?: string;
+  catch_rate?: number;
+  area_level?: number;
+};
+
+export type Encounters = {
+  [key: string]: TrainerOrWildPokemon[];
+};
+
+export type Trainers = {
+  [key: string]: TrainerOrWildPokemon[];
+};
+
+export type RouteProperties = {
+  wild_encounters?: Encounters;
+  trainers?: Trainers;
+  important_trainers?: Trainers;
+};
+
+export type Routes = {
+  [key: string]: RouteProperties;
+};
