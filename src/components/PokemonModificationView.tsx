@@ -49,6 +49,7 @@ const Pokemon = ({
     speed: pokemonData.stats.speed,
   });
 
+  // perhaps some performance gains can be made here
   useUpdateEffect(() => {
     setPokemonChanges({
       ...pokemonChanges,

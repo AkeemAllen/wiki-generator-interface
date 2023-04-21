@@ -1,19 +1,22 @@
 import {
+  Autocomplete,
   Button,
   Grid,
   NativeSelect,
   NumberInput,
   SimpleGrid,
-  TextInput,
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { Types } from "../constants";
+import { useMovesStore } from "../store";
 import { MoveDetails } from "../types";
+import { isNullEmptyOrUndefined } from "../utils";
 
 const Moves = () => {
   const [moveName, setMoveName] = useInputState<string>("");
   const [moveDetails, setMoveDetails] = useInputState<MoveDetails | null>(null);
+  const movesList = useMovesStore((state) => state.movesList);
 
   const handleSearch = () => {
     fetch(`http://localhost:8081/moves/${moveName}`).then((res) => {
@@ -31,9 +34,10 @@ const Moves = () => {
     })
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
+    setMoveDetails(null);
   };
 
-  const handleMoveDetailChanges = (e: any, detail: string) => {
+  const handleMoveDetailChanges = (e: number | string, detail: string) => {
     setMoveDetails((moveDetails: MoveDetails) => {
       return {
         ...moveDetails,
@@ -46,17 +50,25 @@ const Moves = () => {
     <>
       <Grid>
         <Grid.Col span={6}>
-          <TextInput placeholder="Move Name" onChange={setMoveName} />
+          <Autocomplete
+            placeholder="Move Name"
+            onChange={setMoveName}
+            data={movesList}
+          />
         </Grid.Col>
         <Grid.Col span={3}>
-          <Button fullWidth onClick={handleSearch}>
+          <Button
+            fullWidth
+            onClick={handleSearch}
+            disabled={isNullEmptyOrUndefined(moveName)}
+          >
             Search
           </Button>
         </Grid.Col>
         <Grid.Col span={3}>
           <Button
             fullWidth
-            // disabled={pokemonChanges === null}
+            disabled={isNullEmptyOrUndefined(moveDetails)}
             onClick={saveChanges}
           >
             Save Changes

@@ -13,7 +13,7 @@ import {
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { useFetch } from "usehooks-ts";
+import { useMovesStore } from "../store";
 import { Move } from "../types";
 
 type MovesTableProps = {
@@ -40,9 +40,9 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
     learn_method: "machine",
   } as NewMove);
   const [searchTerm, setSearchTerm] = useInputState<string>("");
-  const { data: moveList, error: moveListError } = useFetch<string[]>(
-    "http://localhost:8081/moves"
-  );
+  const movesList = useMovesStore((state) => state.movesList);
+
+  console.log(movesList);
 
   const handleMethodMoveChange = (method: string, move_name: string) => {
     setMoves((moves: Move) => {
@@ -130,6 +130,7 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
           </tr>
         </thead>
         <tbody>
+          {/**There might be better ways of sorting here versus using .filter and .map */}
           {Object.keys(moves)
             .filter((key: string) => moves[key].delete !== true)
             .filter((key: string) => key.includes(searchTerm))
@@ -167,7 +168,7 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
         <Autocomplete
           value={newMove.move_name}
           onChange={(value) => setNewMove({ ...newMove, move_name: value })}
-          data={moveList === undefined ? [] : moveList}
+          data={movesList === undefined ? [] : movesList}
           label="New Move"
         />
         <NativeSelect

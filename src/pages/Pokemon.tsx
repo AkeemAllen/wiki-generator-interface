@@ -1,9 +1,10 @@
 import { Autocomplete, Button, Grid } from "@mantine/core";
 import { useState } from "react";
 import { useSnackbar } from "react-simple-snackbar";
-import { useFetch } from "usehooks-ts";
-import PokemonModifier from "../components/PokemonModifier";
+import PokemonModificationView from "../components/PokemonModificationView";
+import { usePokemonStore } from "../store";
 import { PokemonChanges, PokemonData } from "../types";
+import { isNullEmptyOrUndefined } from "../utils";
 
 const Pokemon = () => {
   const [pokemonName, setPokemonName] = useState<string>("");
@@ -11,36 +12,39 @@ const Pokemon = () => {
   const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
     null
   );
+  const pokemonList = usePokemonStore((state) => state.pokemonList);
   const [openSnackbar] = useSnackbar({
     position: "bottom-center",
   });
-  const { data: pokemonList, error: pokemonListError } = useFetch<string[]>(
-    "http://localhost:8081/pokemon"
-  );
 
   const handleSearch = () => {
     // ideally this should utilize isLoading, data and error states
     // to help rerender the PokemonModifier component
     // but for now settting pokemonData to null will do
     setPokemonData(null);
-    fetch(`http://localhost:8081/pokemon/${pokemonName}`).then((res) => {
-      res.json().then((data) => {
-        if (data.status === 404) {
-          alert(`${pokemonName} not found`);
-          return;
-        }
-        setPokemonData(data);
-      });
-    });
+    fetch(`${import.meta.env.VITE_BASE_URL}/pokemon/${pokemonName}`).then(
+      (res) => {
+        res.json().then((data) => {
+          if (data.status === 404) {
+            alert(`${pokemonName} not found`);
+            return;
+          }
+          setPokemonData(data);
+        });
+      }
+    );
   };
 
   const saveChanges = () => {
     console.log(pokemonChanges);
-    fetch(`http://localhost:8081/save-changes/pokemon/${pokemonName}`, {
-      method: "POST",
-      body: JSON.stringify(pokemonChanges),
-      headers: { "Content-Type": "application/json" },
-    })
+    fetch(
+      `${import.meta.env.VITE_BASE_URL}/save-changes/pokemon/${pokemonName}`,
+      {
+        method: "POST",
+        body: JSON.stringify(pokemonChanges),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
       .then((res) => {
         if (res.status === 200) {
           openSnackbar("Changes saved successfully");
@@ -62,7 +66,11 @@ const Pokemon = () => {
           />
         </Grid.Col>
         <Grid.Col span={3}>
-          <Button fullWidth onClick={handleSearch}>
+          <Button
+            fullWidth
+            onClick={handleSearch}
+            disabled={isNullEmptyOrUndefined(pokemonName)}
+          >
             Search
           </Button>
         </Grid.Col>
@@ -77,7 +85,7 @@ const Pokemon = () => {
         </Grid.Col>
       </Grid>
       {pokemonData && (
-        <PokemonModifier
+        <PokemonModificationView
           pokemonData={pokemonData}
           setPokemonChanges={setPokemonChanges}
           pokemonChanges={pokemonChanges}
