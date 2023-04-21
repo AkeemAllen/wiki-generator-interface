@@ -62,7 +62,9 @@ const Pokemon = () => {
           <Autocomplete
             placeholder="Pokemon Name"
             onChange={(value) => setPokemonName(value)}
-            data={pokemonList === undefined ? [] : pokemonList}
+            data={
+              pokemonList === undefined ? [] : pokemonList.map((p) => p.name)
+            }
           />
         </Grid.Col>
         <Grid.Col span={3}>

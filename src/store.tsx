@@ -1,8 +1,13 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+type Pokemon = {
+  name: string;
+  id: number;
+};
+
 type PokemonStoreState = {
-  pokemonList: string[];
+  pokemonList: Pokemon[];
 };
 
 type PokemonStoreAction = {

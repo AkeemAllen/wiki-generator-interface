@@ -28,7 +28,7 @@ function App() {
   const setPokemonList = usePokemonStore((state) => state.setPokemonList);
   const setMovesList = useMovesStore((state) => state.setMovesList);
 
-  const { data } = useFetch<string[]>(
+  const { data } = useFetch<{ name: string; id: number }[]>(
     `${import.meta.env.VITE_BASE_URL}/pokemon`
   );
 
