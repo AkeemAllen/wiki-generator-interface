@@ -1,21 +1,17 @@
 import {
-  ActionIcon,
   Autocomplete,
-  Box,
   Button,
-  Card,
   Grid,
-  Image,
   Modal,
   NativeSelect,
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
-import { IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { usePokemonStore } from "../../store";
 import { Encounters, Routes } from "../../types";
 import { capitalize, isNullEmptyOrUndefined } from "../../utils";
+import PokemonCard from "../PokemonCard";
 
 type ModalProps = {
   routeName: string;
@@ -74,10 +70,6 @@ const WildEncountersModal = ({
       }
       return currentEncounters;
     });
-  };
-
-  const getSpriteUrl = (pokemonId: number) => {
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
   };
 
   const submitWildEncounters = () => {
@@ -144,54 +136,16 @@ const WildEncountersModal = ({
                   (pokemon, index) => {
                     return (
                       <Grid.Col key={index} span={2}>
-                        <Card
-                          withBorder
-                          shadow="sm"
-                          sx={{
-                            ":hover > #action-icon": {
-                              display: "block",
-                            },
-                          }}
-                        >
-                          <ActionIcon
-                            variant="filled"
-                            id="action-icon"
-                            sx={{
-                              display: "none",
-                              position: "absolute",
-                              right: 10,
-                              top: 10,
-                              zIndex: 1,
-                            }}
-                          >
-                            <IconTrash
-                              onClick={() =>
-                                removePokemonFromEncountertype(
-                                  pokemon.name as string,
-                                  encounterType
-                                )
-                              }
-                            />
-                          </ActionIcon>
-                          <Card.Section>
-                            <Image
-                              src={getSpriteUrl(pokemon.id as number)}
-                              alt={pokemon.name}
-                            />
-                          </Card.Section>
-                          <Box
-                            sx={{
-                              border: "2px solid #e9ecef",
-                              borderRadius: "5px",
-                              textAlign: "center",
-                            }}
-                            p={10}
-                            pt={2}
-                            pb={2}
-                          >
-                            {capitalize(pokemon.name as string)}
-                          </Box>
-                        </Card>
+                        <PokemonCard
+                          pokemonId={pokemon.id as number}
+                          pokemonName={pokemon.name as string}
+                          removePokemon={() =>
+                            removePokemonFromEncountertype(
+                              pokemon.name as string,
+                              encounterType
+                            )
+                          }
+                        />
                       </Grid.Col>
                     );
                   }
