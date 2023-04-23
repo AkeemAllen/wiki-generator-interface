@@ -13,7 +13,7 @@ import {
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { useMovesStore } from "../store";
+import { useMovesStore } from "../stores";
 import { Move } from "../types";
 
 type MovesTableProps = {

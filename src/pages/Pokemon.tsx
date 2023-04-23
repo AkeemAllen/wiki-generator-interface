@@ -2,7 +2,7 @@ import { Autocomplete, Button, Grid } from "@mantine/core";
 import { useState } from "react";
 import { useSnackbar } from "react-simple-snackbar";
 import PokemonModificationView from "../components/PokemonModificationView";
-import { usePokemonStore } from "../store";
+import { usePokemonStore } from "../stores";
 import { PokemonChanges, PokemonData } from "../types";
 import { isNullEmptyOrUndefined } from "../utils";
 

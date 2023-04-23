@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { Types } from "../constants";
-import { useMovesStore } from "../store";
+import { useMovesStore } from "../stores/movesStore";
 import { MoveDetails } from "../types";
 import { isNullEmptyOrUndefined } from "../utils";
 
