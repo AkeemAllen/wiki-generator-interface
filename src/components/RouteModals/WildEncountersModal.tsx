@@ -8,8 +8,8 @@ import {
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { usePokemonStore } from "../../store";
-import { Encounters, Routes } from "../../types";
+import { usePokemonStore, useRouteStore } from "../../stores";
+import { Encounters } from "../../types";
 import { capitalize, isNullEmptyOrUndefined } from "../../utils";
 import PokemonCard from "../PokemonCard";
 
@@ -18,7 +18,6 @@ type ModalProps = {
   opened: boolean;
   close: () => void;
   wildEncounters: Encounters;
-  setRoutes: (value: React.SetStateAction<Routes>) => void;
 };
 
 const WildEncountersModal = ({
@@ -26,7 +25,6 @@ const WildEncountersModal = ({
   opened,
   close,
   wildEncounters,
-  setRoutes,
 }: ModalProps) => {
   const [currentEncountertype, setCurrentEncountertype] =
     useInputState<string>("grass");
@@ -37,6 +35,8 @@ const WildEncountersModal = ({
   // Once the user clicks submit, we will call setRoutes with the new wild encounters.
   const [localizedWildEncounters, setLocalizedWildEncounters] =
     useState<Encounters>({});
+  const routes = useRouteStore((state) => state.routes);
+  const setRoutes = useRouteStore((state) => state.setRoutes);
 
   const addPokemonToEncountertype = () => {
     setLocalizedWildEncounters((wildEncounters: Encounters) => {
@@ -73,18 +73,19 @@ const WildEncountersModal = ({
   };
 
   const submitWildEncounters = () => {
-    setRoutes((routes: Routes) => {
-      return {
-        ...routes,
-        [routeName]: {
-          wild_encounters: localizedWildEncounters,
-        },
-      };
-    });
+    let newRoutes = {
+      ...routes,
+      [routeName]: {
+        wild_encounters: localizedWildEncounters,
+      },
+    };
+    setRoutes(newRoutes);
     close();
   };
 
   useEffect(() => {
+    console.log("wildEncounters changed", wildEncounters);
+    console.log("localizedWildEncounters changed", localizedWildEncounters);
     setLocalizedWildEncounters(wildEncounters);
   }, [wildEncounters]);
 
@@ -124,7 +125,7 @@ const WildEncountersModal = ({
           </Button>
         </Grid.Col>
       </Grid>
-      {localizedWildEncounters !== undefined &&
+      {!isNullEmptyOrUndefined(localizedWildEncounters) &&
         Object.keys(localizedWildEncounters).map((encounterType, index) => {
           return (
             <div key={index}>
@@ -136,16 +137,18 @@ const WildEncountersModal = ({
                   (pokemon, index) => {
                     return (
                       <Grid.Col key={index} span={2}>
-                        <PokemonCard
-                          pokemonId={pokemon.id as number}
-                          pokemonName={pokemon.name as string}
-                          removePokemon={() =>
-                            removePokemonFromEncountertype(
-                              pokemon.name as string,
-                              encounterType
-                            )
-                          }
-                        />
+                        {pokemon.area_level === undefined && (
+                          <PokemonCard
+                            pokemonId={pokemon.id as number}
+                            pokemonName={pokemon.name as string}
+                            removePokemon={() =>
+                              removePokemonFromEncountertype(
+                                pokemon.name as string,
+                                encounterType
+                              )
+                            }
+                          />
+                        )}
                       </Grid.Col>
                     );
                   }

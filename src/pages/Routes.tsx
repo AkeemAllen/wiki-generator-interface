@@ -12,7 +12,8 @@ import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
-import { Encounters, Routes } from "../types";
+import { useRouteStore } from "../stores";
+import { Encounters } from "../types";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -60,7 +61,6 @@ const useStyles = createStyles((theme) => ({
 
 const Routes = () => {
   const { classes } = useStyles();
-  const [routes, setRoutes] = useState<Routes>({} as Routes);
   const [newRouteName, setNewRouteName] = useInputState<string>("");
   const [currentRoute, setCurrentRoute] = useState<string>("");
   const [
@@ -71,14 +71,15 @@ const Routes = () => {
     wildEncountersModalOpen,
     { open: openWildEncountersModal, close: closeWildEncountersModal },
   ] = useDisclosure(false);
+  const setRoutes = useRouteStore((state) => state.setRoutes);
+  const routes = useRouteStore((state) => state.routes);
 
   const addRoute = () => {
-    setRoutes((routes: Routes) => {
-      return {
-        ...routes,
-        [newRouteName.replace(" ", "_")]: {},
-      };
-    });
+    let data = {
+      ...routes,
+      [newRouteName]: {},
+    };
+    setRoutes(data);
     setNewRouteName("");
     closeNewRouteNameModal();
   };
@@ -86,10 +87,13 @@ const Routes = () => {
   return (
     <>
       <Grid>
-        <Grid.Col>
+        <Grid.Col span={2}>
           <Button leftIcon={<IconPlus />} onClick={openNewRouteNameModal}>
             Add Route
           </Button>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <Button>Save Changes</Button>
         </Grid.Col>
       </Grid>
       <Grid mt={50}>
@@ -159,7 +163,6 @@ const Routes = () => {
         wildEncounters={
           routes[currentRoute]?.wild_encounters || ({} as Encounters)
         }
-        setRoutes={setRoutes}
       />
     </>
   );
