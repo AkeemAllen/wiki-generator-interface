@@ -13,6 +13,7 @@
     "@mantine/core": "^6.0.2",
     "@mantine/hooks": "^6.0.2",
     "@tabler/icons-react": "^2.11.0",
+    "@tanstack/react-query": "^4.29.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-simple-snackbar": "^1.1.11",

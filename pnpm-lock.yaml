@@ -5,6 +5,7 @@ specifiers:
   '@mantine/core': ^6.0.2
   '@mantine/hooks': ^6.0.2
   '@tabler/icons-react': ^2.11.0
+  '@tanstack/react-query': ^4.29.3
   '@types/react': ^18.0.27
   '@types/react-dom': ^18.0.10
   '@vitejs/plugin-react-swc': ^3.0.0
@@ -21,6 +22,7 @@ dependencies:
   '@mantine/core': 6.0.2_md2nfwiomeeos7ogkicwnxcafa
   '@mantine/hooks': 6.0.2_react@18.2.0
   '@tabler/icons-react': 2.11.0_react@18.2.0
+  '@tanstack/react-query': 4.29.3_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-simple-snackbar: 1.1.11_biqbaboplfbrettd7655fr4n2y
@@ -688,6 +690,28 @@ packages:
 
   /@tabler/icons/2.11.0:
     resolution: {integrity: sha512-KPESQnvHoSpbAdgzDdrSmeZ9AE8fSU12fU3Cag79uXJCUkC8f741fcvPJPsFMDe0S96VSq3mMYF8JnA7a570uQ==}
+    dev: false
+
+  /@tanstack/query-core/4.29.1:
+    resolution: {integrity: sha512-vkPewLEG8ua0efo3SsVT0BcBtkq5RZX8oPhDAyKL+k/rdOYSQTEocfGEXSaBwIwsXeOGBUpfKqI+UmHvNqdWXg==}
+    dev: false
+
+  /@tanstack/react-query/4.29.3_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-FPQrMu7PbCgBcVzoRJm7WmQnAFv+LUgZM9KBZ7Vk/+yERH2BDLvQRuAgczQd5Tb1s3HbOktECRDaOkUxdyBAjw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@tanstack/query-core': 4.29.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
 
   /@types/parse-json/4.0.0:

@@ -12,41 +12,55 @@ import {
   IconDisc,
   IconGitBranch,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import SnackBarProvider from "react-simple-snackbar";
-import { useFetch, useUpdateEffect } from "usehooks-ts";
 import "./App.css";
 import NavButton from "./components/NavButton";
 import Moves from "./pages/Moves";
 import Pokemon from "./pages/Pokemon";
 import Routes from "./pages/Routes";
-import { useMovesStore, usePokemonStore } from "./store";
+import { useMovesStore, usePokemonStore, useRouteStore } from "./stores";
 
 function App() {
   const [navBarOpened, setNavBarOpened] = useState(false);
   const [currentPage, setCurrentPage] = useState("pokemon");
   const setPokemonList = usePokemonStore((state) => state.setPokemonList);
   const setMovesList = useMovesStore((state) => state.setMovesList);
+  const setRoutes = useRouteStore((state) => state.setRoutes);
 
-  const { data } = useFetch<{ name: string; id: number }[]>(
-    `${import.meta.env.VITE_BASE_URL}/pokemon`
-  );
-
-  const { data: moves } = useFetch<string[]>(
-    `${import.meta.env.VITE_BASE_URL}/moves`
-  );
-
-  useUpdateEffect(() => {
-    if (data) {
+  // find out if there is a better way to do this
+  // since the data is not being used anywhere else
+  const { data: pokemon } = useQuery({
+    queryKey: ["pokemon"],
+    queryFn: () =>
+      fetch(`${import.meta.env.VITE_BASE_URL}/pokemon`).then((res) =>
+        res.json()
+      ),
+    onSuccess: (data) => {
       setPokemonList(data);
-    }
-  }, [data]);
+    },
+  });
 
-  useUpdateEffect(() => {
-    if (moves) {
-      setMovesList(moves);
-    }
-  }, [moves]);
+  const { data: moves } = useQuery({
+    queryKey: ["moves"],
+    queryFn: () =>
+      fetch(`${import.meta.env.VITE_BASE_URL}/moves`).then((res) => res.json()),
+    onSuccess: (data) => {
+      setMovesList(data);
+    },
+  });
+
+  const { data: routes } = useQuery({
+    queryKey: ["routes"],
+    queryFn: () =>
+      fetch(`${import.meta.env.VITE_BASE_URL}/game_routes`).then((res) =>
+        res.json()
+      ),
+    onSuccess: (data) => {
+      setRoutes(data);
+    },
+  });
 
   return (
     <SnackBarProvider>
