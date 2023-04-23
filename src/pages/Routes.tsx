@@ -10,10 +10,11 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
 import { useRouteStore } from "../stores";
-import { Encounters } from "../types";
+import { Encounters, Routes as RoutesType } from "../types";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -84,6 +85,19 @@ const Routes = () => {
     closeNewRouteNameModal();
   };
 
+  const { mutate } = useMutation({
+    mutationFn: (routes: RoutesType) => {
+      return fetch(
+        `${import.meta.env.VITE_BASE_URL}/save-changes/game_routes`,
+        {
+          method: "POST",
+          body: JSON.stringify(routes),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    },
+  });
+
   return (
     <>
       <Grid>
@@ -92,7 +106,7 @@ const Routes = () => {
             Add Route
           </Button>
         </Grid.Col>
-        <Grid.Col span={2}>
+        <Grid.Col span={2} onClick={() => mutate(routes)}>
           <Button>Save Changes</Button>
         </Grid.Col>
       </Grid>

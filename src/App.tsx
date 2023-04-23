@@ -40,6 +40,7 @@ function App() {
     onSuccess: (data) => {
       setPokemonList(data);
     },
+    refetchOnWindowFocus: false,
   });
 
   const { data: moves } = useQuery({
@@ -49,6 +50,7 @@ function App() {
     onSuccess: (data) => {
       setMovesList(data);
     },
+    refetchOnWindowFocus: false,
   });
 
   const { data: routes } = useQuery({
@@ -60,6 +62,7 @@ function App() {
     onSuccess: (data) => {
       setRoutes(data);
     },
+    refetchOnWindowFocus: false,
   });
 
   return (

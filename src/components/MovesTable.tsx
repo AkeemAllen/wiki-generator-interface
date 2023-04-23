@@ -42,8 +42,6 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
   const [searchTerm, setSearchTerm] = useInputState<string>("");
   const movesList = useMovesStore((state) => state.movesList);
 
-  console.log(movesList);
-
   const handleMethodMoveChange = (method: string, move_name: string) => {
     setMoves((moves: Move) => {
       return {

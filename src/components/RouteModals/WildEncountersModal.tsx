@@ -84,8 +84,6 @@ const WildEncountersModal = ({
   };
 
   useEffect(() => {
-    console.log("wildEncounters changed", wildEncounters);
-    console.log("localizedWildEncounters changed", localizedWildEncounters);
     setLocalizedWildEncounters(wildEncounters);
   }, [wildEncounters]);
 

@@ -36,7 +36,6 @@ const Pokemon = () => {
   };
 
   const saveChanges = () => {
-    console.log(pokemonChanges);
     fetch(
       `${import.meta.env.VITE_BASE_URL}/save-changes/pokemon/${pokemonName}`,
       {
