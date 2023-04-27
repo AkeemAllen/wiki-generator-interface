@@ -4,12 +4,14 @@ import {
   Grid,
   Modal,
   NativeSelect,
+  NumberInput,
+  TextInput,
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { usePokemonStore, useRouteStore } from "../../stores";
-import { Encounters } from "../../types";
+import { Encounters, Routes } from "../../types";
 import { capitalize, isNullEmptyOrUndefined } from "../../utils";
 import PokemonCard from "../PokemonCard";
 
@@ -35,8 +37,12 @@ const WildEncountersModal = ({
   // Once the user clicks submit, we will call setRoutes with the new wild encounters.
   const [localizedWildEncounters, setLocalizedWildEncounters] =
     useState<Encounters>({});
+  const [encounterRate, setEncounterRate] = useState<number>(0);
   const routes = useRouteStore((state) => state.routes);
   const setRoutes = useRouteStore((state) => state.setRoutes);
+  const [areaLevels, setAreaLevels] = useState(
+    routes[routeName]?.wild_encounters_area_levels || {}
+  );
 
   const addPokemonToEncountertype = () => {
     setLocalizedWildEncounters((wildEncounters: Encounters) => {
@@ -47,6 +53,7 @@ const WildEncountersModal = ({
           {
             name: pokemonName,
             id: pokemonList?.find((p) => p.name === pokemonName)?.id,
+            encounter_rate: encounterRate,
           },
         ],
       };
@@ -77,8 +84,9 @@ const WildEncountersModal = ({
       ...routes,
       [routeName]: {
         wild_encounters: localizedWildEncounters,
+        wild_encounters_area_levels: areaLevels,
       },
-    };
+    } as Routes;
     setRoutes(newRoutes);
     close();
   };
@@ -94,7 +102,7 @@ const WildEncountersModal = ({
         Wild Encounters
       </Title>
       <Grid mt={5}>
-        <Grid.Col span={4}>
+        <Grid.Col span={2}>
           <NativeSelect
             label="Encounter Type"
             placeholder="Encounter Type"
@@ -105,13 +113,20 @@ const WildEncountersModal = ({
         </Grid.Col>
         <Grid.Col span={4}>
           <Autocomplete
-            label="Pokemon to add to current encounter type"
+            label="Pokemon for current encounter type"
             placeholder="Pokemon Name"
             value={pokemonName}
             onChange={(value) => setPokemonName(value)}
             data={
               pokemonList === undefined ? [] : pokemonList.map((p) => p.name)
             }
+          />
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <NumberInput
+            label="Encounter Rate"
+            value={encounterRate}
+            onChange={(e: number) => setEncounterRate(e)}
           />
         </Grid.Col>
         <Grid.Col span={2} mt={25}>
@@ -127,9 +142,21 @@ const WildEncountersModal = ({
         Object.keys(localizedWildEncounters).map((encounterType, index) => {
           return (
             <div key={index}>
-              <Title mt={20} order={4}>
+              <Title order={4} mt={20}>
                 {capitalize(encounterType)} Encounters{" "}
               </Title>
+              <TextInput
+                placeholder="Level Range. Eg.'lv 1-5'"
+                mt={10}
+                sx={{ width: "12rem" }}
+                value={areaLevels[encounterType] || ""}
+                onChange={(e) =>
+                  setAreaLevels({
+                    ...areaLevels,
+                    [encounterType]: e.target.value,
+                  })
+                }
+              />
               <Grid mt={10}>
                 {localizedWildEncounters[encounterType]?.map(
                   (pokemon, index) => {
@@ -139,6 +166,7 @@ const WildEncountersModal = ({
                           <PokemonCard
                             pokemonId={pokemon.id as number}
                             pokemonName={pokemon.name as string}
+                            encounterRate={pokemon.encounter_rate as number}
                             removePokemon={() =>
                               removePokemonFromEncountertype(
                                 pokemon.name as string,

@@ -1,5 +1,6 @@
 import {
   Accordion,
+  ActionIcon,
   Box,
   Button,
   createStyles,
@@ -9,9 +10,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
-import { IconPlus } from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useSnackbar } from "react-simple-snackbar";
 import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
 import { useRouteStore } from "../stores";
 import { Encounters, Routes as RoutesType } from "../types";
@@ -43,6 +45,7 @@ const useStyles = createStyles((theme) => ({
           : theme.colors.gray[2],
       borderRadius: theme.radius.md,
       zIndex: 1,
+      // position: "absolute",
     },
   },
   box: {
@@ -60,6 +63,31 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+type RouteNameModalProps = {
+  isOpen: boolean;
+  close: () => void;
+  saveFunction: () => void;
+  routeName: string;
+  setRouteName: any;
+};
+
+const RouteNameModal = ({
+  isOpen,
+  close,
+  saveFunction,
+  routeName,
+  setRouteName,
+}: RouteNameModalProps) => {
+  return (
+    <Modal opened={isOpen} withCloseButton={false} onClose={close}>
+      <TextInput label="Route Name" value={routeName} onChange={setRouteName} />
+      <Button onClick={saveFunction} mt={20}>
+        Save Route
+      </Button>
+    </Modal>
+  );
+};
+
 const Routes = () => {
   const { classes } = useStyles();
   const [newRouteName, setNewRouteName] = useInputState<string>("");
@@ -69,17 +97,44 @@ const Routes = () => {
     { open: openNewRouteNameModal, close: closeNewRouteNameModal },
   ] = useDisclosure(false);
   const [
+    editRouteNameModalOpen,
+    { open: openEditRouteNameModal, close: closeEditRouteNameModal },
+  ] = useDisclosure(false);
+  const [routeNameToEdit, setRouteNameToEdit] = useState("");
+  const [
     wildEncountersModalOpen,
     { open: openWildEncountersModal, close: closeWildEncountersModal },
   ] = useDisclosure(false);
   const setRoutes = useRouteStore((state) => state.setRoutes);
   const routes = useRouteStore((state) => state.routes);
+  const [openSnackbar] = useSnackbar({
+    position: "bottom-center",
+  });
 
   const addRoute = () => {
     let data = {
       ...routes,
-      [newRouteName]: {},
+      [newRouteName.replace(" ", "_")]: {},
     };
+    setRoutes(data);
+    setNewRouteName("");
+    closeNewRouteNameModal();
+  };
+
+  const deleteRoute = (routeName: string) => {
+    let data = {
+      ...routes,
+    };
+    delete data[routeName];
+    setRoutes(data);
+  };
+
+  const editRouteName = () => {
+    let data = {
+      ...routes,
+      [newRouteName.replace(" ", "_")]: routes[routeNameToEdit],
+    };
+    delete data[routeNameToEdit];
     setRoutes(data);
     setNewRouteName("");
     closeNewRouteNameModal();
@@ -95,6 +150,9 @@ const Routes = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
+    },
+    onSuccess: () => {
+      openSnackbar("Changes saved successfully!");
     },
   });
 
@@ -149,6 +207,23 @@ const Routes = () => {
                     >
                       Important Trainers
                     </Box>
+                    <Grid mt={5}>
+                      <Grid.Col span={2}>
+                        <ActionIcon
+                          onClick={() => {
+                            openEditRouteNameModal();
+                            setRouteNameToEdit(routeName);
+                          }}
+                        >
+                          <IconEdit />
+                        </ActionIcon>
+                      </Grid.Col>
+                      <Grid.Col span={2}>
+                        <ActionIcon onClick={() => deleteRoute(routeName)}>
+                          <IconTrash />
+                        </ActionIcon>
+                      </Grid.Col>
+                    </Grid>
                   </Accordion.Panel>
                 </Accordion.Item>
               </Accordion>
@@ -156,20 +231,20 @@ const Routes = () => {
           );
         })}
       </Grid>
-      <Modal
-        opened={newRouteNameModalOpen}
-        withCloseButton={false}
-        onClose={closeNewRouteNameModal}
-      >
-        <TextInput
-          label="Route Name"
-          value={newRouteName}
-          onChange={setNewRouteName}
-        />
-        <Button onClick={addRoute} mt={20}>
-          Save Route
-        </Button>
-      </Modal>
+      <RouteNameModal
+        isOpen={newRouteNameModalOpen}
+        close={closeNewRouteNameModal}
+        saveFunction={addRoute}
+        routeName={newRouteName}
+        setRouteName={setNewRouteName}
+      />
+      <RouteNameModal
+        isOpen={editRouteNameModalOpen}
+        close={closeEditRouteNameModal}
+        saveFunction={editRouteName}
+        routeName={newRouteName}
+        setRouteName={setNewRouteName}
+      />
       <WildEncountersModal
         opened={wildEncountersModalOpen}
         close={closeWildEncountersModal}

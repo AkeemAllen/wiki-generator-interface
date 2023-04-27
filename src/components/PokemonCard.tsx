@@ -6,12 +6,14 @@ type PokemonCardProps = {
   removePokemon: () => void;
   pokemonName: string;
   pokemonId: number;
+  encounterRate: number;
 };
 
 const PokemonCard = ({
   removePokemon,
   pokemonName,
   pokemonId,
+  encounterRate,
 }: PokemonCardProps) => {
   const getSpriteUrl = () => {
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
@@ -53,7 +55,7 @@ const PokemonCard = ({
         pt={2}
         pb={2}
       >
-        {capitalize(pokemonName)}
+        {capitalize(pokemonName)} {encounterRate}%
       </Box>
     </Card>
   );

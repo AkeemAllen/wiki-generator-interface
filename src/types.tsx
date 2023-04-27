@@ -52,7 +52,7 @@ export type TrainerOrWildPokemon = {
   item?: string;
   nature?: string;
   ability?: string;
-  catch_rate?: number;
+  encounter_rate?: number;
   area_level?: number;
 };
 
@@ -64,10 +64,15 @@ export type Trainers = {
   [key: string]: TrainerOrWildPokemon[];
 };
 
+export type AreaLevels = {
+  [key: string]: string;
+};
+
 export type RouteProperties = {
   wild_encounters?: Encounters;
   trainers?: Trainers;
   important_trainers?: Trainers;
+  wild_encounters_area_levels?: AreaLevels;
 };
 
 export type Routes = {
