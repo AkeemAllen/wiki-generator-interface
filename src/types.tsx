@@ -73,6 +73,7 @@ export type RouteProperties = {
   trainers?: Trainers;
   important_trainers?: Trainers;
   wild_encounters_area_levels?: AreaLevels;
+  position: number;
 };
 
 export type Routes = {

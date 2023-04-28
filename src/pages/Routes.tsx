@@ -6,8 +6,10 @@ import {
   createStyles,
   Grid,
   Modal,
+  NumberInput,
   rem,
   TextInput,
+  Tooltip,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -91,6 +93,7 @@ const Routes = () => {
   const { classes } = useStyles();
   const [newRouteName, setNewRouteName] = useInputState<string>("");
   const [currentRoute, setCurrentRoute] = useState<string>("");
+  const [newPosition, setNewPosition] = useState<number>(0);
   const [
     newRouteNameModalOpen,
     { open: openNewRouteNameModal, close: closeNewRouteNameModal },
@@ -104,6 +107,11 @@ const Routes = () => {
     wildEncountersModalOpen,
     { open: openWildEncountersModal, close: closeWildEncountersModal },
   ] = useDisclosure(false);
+  const [
+    editPositionModalOpen,
+    { open: openEditPositionModal, close: closeEditPositionModal },
+  ] = useDisclosure(false);
+
   const setRoutes = useRouteStore((state) => state.setRoutes);
   const routes = useRouteStore((state) => state.routes);
   const [openSnackbar] = useSnackbar({
@@ -152,10 +160,10 @@ const Routes = () => {
       return fetch(
         `${
           import.meta.env.VITE_BASE_URL
-        }/game_route/${routeNameToEdit}/edit_route_name/${formatted_route_name}`,
+        }/game_route/${routeNameToEdit}/edit_route_name/`,
         {
           method: "POST",
-          body: JSON.stringify({}),
+          body: JSON.stringify({ new_route_name: formatted_route_name }),
           headers: { "Content-Type": "application/json" },
         }
       ).then((res) => res.json());
@@ -165,6 +173,35 @@ const Routes = () => {
       setNewRouteName("");
       openSnackbar("Route name changed successfully!");
       closeEditRouteNameModal();
+    },
+  });
+
+  const { mutate: updateRoutePosition } = useMutation({
+    mutationFn: ({ routeNameToEdit, newPosition }: any) => {
+      console.log(routeNameToEdit);
+      console.log({
+        ...routes[routeNameToEdit],
+        position: newPosition,
+      });
+      return fetch(
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/save-changes/game_route/${routeNameToEdit}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            ...routes[routeNameToEdit],
+            position: newPosition,
+          }),
+          headers: { "Content-Type": "application/json" },
+        }
+      ).then((res) => res.json());
+    },
+    onSuccess: (data) => {
+      setRoutes(data.routes);
+      setNewPosition(0);
+      closeEditPositionModal();
+      openSnackbar("Route position changed successfully!");
     },
   });
 
@@ -228,6 +265,18 @@ const Routes = () => {
                           <IconTrash />
                         </ActionIcon>
                       </Grid.Col>
+                      <Grid.Col span={4}>
+                        <Tooltip label={"Click to edit position"}>
+                          <ActionIcon
+                            onClick={() => {
+                              openEditPositionModal();
+                              setRouteNameToEdit(routeName);
+                            }}
+                          >
+                            {routes[routeName].position}
+                          </ActionIcon>
+                        </Tooltip>
+                      </Grid.Col>
                     </Grid>
                   </Accordion.Panel>
                 </Accordion.Item>
@@ -250,6 +299,22 @@ const Routes = () => {
         routeName={newRouteName}
         setRouteName={setNewRouteName}
       />
+      <Modal
+        opened={editPositionModalOpen}
+        onClose={closeEditPositionModal}
+        withCloseButton={false}
+      >
+        <NumberInput
+          label="New Position"
+          value={newPosition}
+          onChange={(e: number) => setNewPosition(e)}
+        />
+        <Button
+          onClick={() => updateRoutePosition({ routeNameToEdit, newPosition })}
+        >
+          Save Changes
+        </Button>
+      </Modal>
       <WildEncountersModal
         opened={wildEncountersModalOpen}
         close={closeWildEncountersModal}
