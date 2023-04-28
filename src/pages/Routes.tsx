@@ -16,7 +16,6 @@ import { useState } from "react";
 import { useSnackbar } from "react-simple-snackbar";
 import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
 import { useRouteStore } from "../stores";
-import { Encounters, Routes as RoutesType } from "../types";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -111,63 +110,69 @@ const Routes = () => {
     position: "bottom-center",
   });
 
-  const addRoute = () => {
-    let data = {
-      ...routes,
-      [newRouteName.replace(" ", "_")]: {},
-    };
-    setRoutes(data);
-    setNewRouteName("");
-    closeNewRouteNameModal();
-  };
-
-  const deleteRoute = (routeName: string) => {
-    let data = {
-      ...routes,
-    };
-    delete data[routeName];
-    setRoutes(data);
-  };
-
-  const editRouteName = () => {
-    let data = {
-      ...routes,
-      [newRouteName.replace(" ", "_")]: routes[routeNameToEdit],
-    };
-    delete data[routeNameToEdit];
-    setRoutes(data);
-    setNewRouteName("");
-    closeNewRouteNameModal();
-  };
-
-  const { mutate } = useMutation({
-    mutationFn: (routes: RoutesType) => {
+  const { mutate: addNewRoute } = useMutation({
+    mutationFn: (routeName: string) => {
+      let formatted_route_name = routeName.replace(" ", "_");
       return fetch(
-        `${import.meta.env.VITE_BASE_URL}/save-changes/game_routes`,
+        `${import.meta.env.VITE_BASE_URL}/game_route/${formatted_route_name}`,
         {
           method: "POST",
-          body: JSON.stringify(routes),
+          body: JSON.stringify({
+            route_properties: {
+              wild_encounters: {},
+            },
+          }),
           headers: { "Content-Type": "application/json" },
         }
-      );
+      ).then((res) => res.json());
     },
-    onSuccess: () => {
-      openSnackbar("Changes saved successfully!");
+    onSuccess: (data) => {
+      setRoutes(data.routes);
+      setNewRouteName("");
+      openSnackbar("Route added successfully!");
+      closeNewRouteNameModal();
+    },
+  });
+
+  const { mutate: deleteRoute } = useMutation({
+    mutationFn: (routeName: string) => {
+      return fetch(`${import.meta.env.VITE_BASE_URL}/game_route/${routeName}`, {
+        method: "DELETE",
+      }).then((res) => res.json());
+    },
+    onSuccess: (data) => {
+      setRoutes(data.routes);
+      openSnackbar("Route deleted successfully!");
+    },
+  });
+
+  const { mutate: editRouteName } = useMutation({
+    mutationFn: ({ routeNameToEdit, newRouteName }: any) => {
+      let formatted_route_name = newRouteName.replace(" ", "_");
+      return fetch(
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/game_route/${routeNameToEdit}/edit_route_name/${formatted_route_name}`,
+        {
+          method: "POST",
+          body: JSON.stringify({}),
+          headers: { "Content-Type": "application/json" },
+        }
+      ).then((res) => res.json());
+    },
+    onSuccess: (data) => {
+      setRoutes(data.routes);
+      setNewRouteName("");
+      openSnackbar("Route name changed successfully!");
+      closeEditRouteNameModal();
     },
   });
 
   return (
     <>
-      <Grid>
-        <Grid.Col span={2}>
-          <Button leftIcon={<IconPlus />} onClick={openNewRouteNameModal}>
-            Add Route
-          </Button>
-        </Grid.Col>
-        <Grid.Col span={2} onClick={() => mutate(routes)}>
-          <Button>Save Changes</Button>
-        </Grid.Col>
-      </Grid>
+      <Button leftIcon={<IconPlus />} onClick={openNewRouteNameModal}>
+        Add Route
+      </Button>
       <Grid mt={50}>
         {Object.keys(routes).map((routeName, index) => {
           return (
@@ -234,14 +239,14 @@ const Routes = () => {
       <RouteNameModal
         isOpen={newRouteNameModalOpen}
         close={closeNewRouteNameModal}
-        saveFunction={addRoute}
+        saveFunction={() => addNewRoute(newRouteName)}
         routeName={newRouteName}
         setRouteName={setNewRouteName}
       />
       <RouteNameModal
         isOpen={editRouteNameModalOpen}
         close={closeEditRouteNameModal}
-        saveFunction={editRouteName}
+        saveFunction={() => editRouteName({ routeNameToEdit, newRouteName })}
         routeName={newRouteName}
         setRouteName={setNewRouteName}
       />
@@ -249,9 +254,6 @@ const Routes = () => {
         opened={wildEncountersModalOpen}
         close={closeWildEncountersModal}
         routeName={currentRoute}
-        wildEncounters={
-          routes[currentRoute]?.wild_encounters || ({} as Encounters)
-        }
       />
     </>
   );

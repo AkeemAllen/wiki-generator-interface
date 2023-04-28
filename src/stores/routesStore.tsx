@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
 import { Routes } from "../types";
 
 type RouteStoreState = {
@@ -11,8 +10,8 @@ type RouteStoreAction = {
 };
 
 export const useRouteStore = create<RouteStoreState & RouteStoreAction>(
-  devtools((set) => ({
+  (set) => ({
     routes: {},
     setRoutes: (routes) => set(() => ({ routes })),
-  }))
+  })
 );
