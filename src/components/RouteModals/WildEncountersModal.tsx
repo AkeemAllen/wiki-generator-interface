@@ -9,9 +9,9 @@ import {
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useSnackbar } from "react-simple-snackbar";
+import { ToastContainer, toast } from "react-toastify";
+import { useEditRoute } from "../../apis/routesApis";
 import { usePokemonStore, useRouteStore } from "../../stores";
 import { Encounters } from "../../types";
 import { capitalize, isNullEmptyOrUndefined } from "../../utils";
@@ -37,7 +37,6 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
   const [wildEncounters, setWildEncounters] = useState<Encounters>(
     { ...routes[routeName]?.wild_encounters } || {}
   );
-  const [openSnackbar] = useSnackbar();
 
   const addPokemonToEncountertype = () => {
     setWildEncounters((wildEncounters: Encounters) => {
@@ -74,24 +73,16 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
     });
   };
 
-  const { mutate: submitWildEncounters } = useMutation({
-    mutationFn: () => {
-      return fetch(
-        `${import.meta.env.VITE_BASE_URL}/save-changes/game_route/${routeName}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({
-            wild_encounters: wildEncounters,
-            wild_encounters_area_levels: areaLevels,
-          }),
-          headers: { "Content-Type": "application/json" },
-        }
-      ).then((res) => res.json());
+  const { mutate: submitWildEncounters } = useEditRoute({
+    routeName,
+    body: {
+      wild_encounters: wildEncounters,
+      wild_encounters_area_levels: areaLevels,
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       close();
       setRoutes(data.routes);
-      openSnackbar("Successfully updated wild encounters");
+      toast("Successfully updated wild encounters");
     },
   });
 
@@ -189,6 +180,7 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
       <Button fullWidth mt={20} onClick={() => submitWildEncounters()}>
         Submit Wild Encounters
       </Button>
+      <ToastContainer />
     </Modal>
   );
 };

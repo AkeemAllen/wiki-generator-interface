@@ -1,6 +1,11 @@
 import { Autocomplete, Button, Grid } from "@mantine/core";
 import { useState } from "react";
-import { useSnackbar } from "react-simple-snackbar";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  useGetPokemonByName,
+  useSavePokemonChanges,
+} from "../apis/pokemonApis";
 import PokemonModificationView from "../components/PokemonModificationView";
 import { usePokemonStore } from "../stores";
 import { PokemonChanges, PokemonData } from "../types";
@@ -13,47 +18,33 @@ const Pokemon = () => {
     null
   );
   const pokemonList = usePokemonStore((state) => state.pokemonList);
-  const [openSnackbar] = useSnackbar({
-    position: "bottom-center",
+
+  const { refetch, isLoading } = useGetPokemonByName({
+    pokemonName,
+    onSuccess: (data: any) => setPokemonData(data),
+  });
+
+  const { mutate: mutatePokemon } = useSavePokemonChanges({
+    pokemonName,
+    pokemonChanges: pokemonChanges as PokemonChanges,
+    onSuccess: () => {
+      toast("Changes Saved");
+      setPokemonChanges(null);
+    },
+    onError: () => {
+      toast("Error Saving changes");
+    },
   });
 
   const handleSearch = () => {
-    // ideally this should utilize isLoading, data and error states
-    // to help rerender the PokemonModifier component
-    // but for now settting pokemonData to null will do
     setPokemonData(null);
-    fetch(`${import.meta.env.VITE_BASE_URL}/pokemon/${pokemonName}`).then(
-      (res) => {
-        res.json().then((data) => {
-          if (data.status === 404) {
-            alert(`${pokemonName} not found`);
-            return;
-          }
-          setPokemonData(data);
-        });
-      }
-    );
+    refetch();
   };
 
   const saveChanges = () => {
-    fetch(
-      `${import.meta.env.VITE_BASE_URL}/save-changes/pokemon/${pokemonName}`,
-      {
-        method: "POST",
-        body: JSON.stringify(pokemonChanges),
-        headers: { "Content-Type": "application/json" },
-      }
-    )
-      .then((res) => {
-        if (res.status === 200) {
-          openSnackbar("Changes saved successfully");
-          setPokemonChanges(null);
-        } else {
-          openSnackbar("Error saving changes");
-        }
-      })
-      .catch((err) => console.log(err));
+    mutatePokemon();
   };
+
   return (
     <>
       <Grid>
@@ -85,13 +76,14 @@ const Pokemon = () => {
           </Button>
         </Grid.Col>
       </Grid>
-      {pokemonData && (
+      {!isLoading && pokemonData && (
         <PokemonModificationView
           pokemonData={pokemonData}
           setPokemonChanges={setPokemonChanges}
           pokemonChanges={pokemonChanges}
         />
       )}
+      <ToastContainer position="bottom-center" />
     </>
   );
 };

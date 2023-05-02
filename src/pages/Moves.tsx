@@ -8,6 +8,8 @@ import {
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
+import { ToastContainer, toast } from "react-toastify";
+import { useGetMovesByName, useSaveMoveChanges } from "../apis/movesApis";
 import { Types } from "../constants";
 import { useMovesStore } from "../stores/movesStore";
 import { MoveDetails } from "../types";
@@ -18,23 +20,32 @@ const Moves = () => {
   const [moveDetails, setMoveDetails] = useInputState<MoveDetails | null>(null);
   const movesList = useMovesStore((state) => state.movesList);
 
+  const { refetch } = useGetMovesByName({
+    moveName,
+    onSuccess: (data: any) => {
+      setMoveDetails(data);
+    },
+  });
+
+  const { mutate: mutateMove } = useSaveMoveChanges({
+    moveName,
+    moveChanges: moveDetails as MoveDetails,
+    onSuccess: () => {
+      toast("Changes Saved");
+      setMoveDetails(null);
+    },
+    onError: () => {
+      toast("Error Saving changes");
+    },
+  });
+
   const handleSearch = () => {
-    fetch(`http://localhost:8081/moves/${moveName}`).then((res) => {
-      res.json().then((data) => {
-        setMoveDetails(data);
-      });
-    });
+    setMoveDetails(null);
+    refetch();
   };
 
   const saveChanges = () => {
-    fetch(`http://localhost:8081/save-changes/moves/${moveName}`, {
-      method: "POST",
-      body: JSON.stringify(moveDetails),
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-    setMoveDetails(null);
+    mutateMove();
   };
 
   const handleMoveDetailChanges = (e: number | string, detail: string) => {
@@ -113,6 +124,7 @@ const Moves = () => {
           </SimpleGrid>
         </>
       )}
+      <ToastContainer />
     </>
   );
 };

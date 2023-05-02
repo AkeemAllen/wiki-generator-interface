@@ -13,9 +13,14 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useSnackbar } from "react-simple-snackbar";
+import { toast, ToastContainer } from "react-toastify";
+import {
+  useAddNewRoute,
+  useDeleteRoute,
+  useEditRouteName,
+  useUpdateRoutePosition,
+} from "../apis/routesApis";
 import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
 import { useRouteStore } from "../stores";
 
@@ -114,95 +119,31 @@ const Routes = () => {
 
   const setRoutes = useRouteStore((state) => state.setRoutes);
   const routes = useRouteStore((state) => state.routes);
-  const [openSnackbar] = useSnackbar({
-    position: "bottom-center",
+
+  const { mutate: addNewRoute } = useAddNewRoute((data) => {
+    setRoutes(data.routes);
+    setNewRouteName("");
+    toast("Route added successfully!");
+    closeNewRouteNameModal();
   });
 
-  const { mutate: addNewRoute } = useMutation({
-    mutationFn: (routeName: string) => {
-      let formatted_route_name = routeName.replace(" ", "_");
-      return fetch(
-        `${import.meta.env.VITE_BASE_URL}/game_route/${formatted_route_name}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            route_properties: {
-              wild_encounters: {},
-            },
-          }),
-          headers: { "Content-Type": "application/json" },
-        }
-      ).then((res) => res.json());
-    },
-    onSuccess: (data) => {
-      setRoutes(data.routes);
-      setNewRouteName("");
-      openSnackbar("Route added successfully!");
-      closeNewRouteNameModal();
-    },
+  const { mutate: deleteRoute } = useDeleteRoute((data) => {
+    setRoutes(data.routes);
+    toast("Route deleted successfully!");
   });
 
-  const { mutate: deleteRoute } = useMutation({
-    mutationFn: (routeName: string) => {
-      return fetch(`${import.meta.env.VITE_BASE_URL}/game_route/${routeName}`, {
-        method: "DELETE",
-      }).then((res) => res.json());
-    },
-    onSuccess: (data) => {
-      setRoutes(data.routes);
-      openSnackbar("Route deleted successfully!");
-    },
+  const { mutate: editRouteName } = useEditRouteName((data) => {
+    setRoutes(data.routes);
+    setNewRouteName("");
+    toast("Route name changed successfully!");
+    closeEditRouteNameModal();
   });
 
-  const { mutate: editRouteName } = useMutation({
-    mutationFn: ({ routeNameToEdit, newRouteName }: any) => {
-      let formatted_route_name = newRouteName.replace(" ", "_");
-      return fetch(
-        `${
-          import.meta.env.VITE_BASE_URL
-        }/game_route/${routeNameToEdit}/edit_route_name/`,
-        {
-          method: "POST",
-          body: JSON.stringify({ new_route_name: formatted_route_name }),
-          headers: { "Content-Type": "application/json" },
-        }
-      ).then((res) => res.json());
-    },
-    onSuccess: (data) => {
-      setRoutes(data.routes);
-      setNewRouteName("");
-      openSnackbar("Route name changed successfully!");
-      closeEditRouteNameModal();
-    },
-  });
-
-  const { mutate: updateRoutePosition } = useMutation({
-    mutationFn: ({ routeNameToEdit, newPosition }: any) => {
-      console.log(routeNameToEdit);
-      console.log({
-        ...routes[routeNameToEdit],
-        position: newPosition,
-      });
-      return fetch(
-        `${
-          import.meta.env.VITE_BASE_URL
-        }/save-changes/game_route/${routeNameToEdit}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({
-            ...routes[routeNameToEdit],
-            position: newPosition,
-          }),
-          headers: { "Content-Type": "application/json" },
-        }
-      ).then((res) => res.json());
-    },
-    onSuccess: (data) => {
-      setRoutes(data.routes);
-      setNewPosition(0);
-      closeEditPositionModal();
-      openSnackbar("Route position changed successfully!");
-    },
+  const { mutate: updateRoutePosition } = useUpdateRoutePosition((data) => {
+    setRoutes(data.routes);
+    setNewPosition(0);
+    closeEditPositionModal();
+    toast("Route position changed successfully!");
   });
 
   return (
@@ -320,6 +261,7 @@ const Routes = () => {
         close={closeWildEncountersModal}
         routeName={currentRoute}
       />
+      <ToastContainer />
     </>
   );
 };

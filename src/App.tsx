@@ -12,10 +12,12 @@ import {
   IconDisc,
   IconGitBranch,
 } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import SnackBarProvider from "react-simple-snackbar";
 import "./App.css";
+import { useGetMoves } from "./apis/movesApis";
+import { useGetPokemon } from "./apis/pokemonApis";
+import { useGetRoutes } from "./apis/routesApis";
 import NavButton from "./components/NavButton";
 import Moves from "./pages/Moves";
 import Pokemon from "./pages/Pokemon";
@@ -29,41 +31,11 @@ function App() {
   const setMovesList = useMovesStore((state) => state.setMovesList);
   const setRoutes = useRouteStore((state) => state.setRoutes);
 
-  // find out if there is a better way to do this
-  // since the data is not being used anywhere else
-  const { data: pokemon } = useQuery({
-    queryKey: ["pokemon"],
-    queryFn: () =>
-      fetch(`${import.meta.env.VITE_BASE_URL}/pokemon`).then((res) =>
-        res.json()
-      ),
-    onSuccess: (data) => {
-      setPokemonList(data);
-    },
-    refetchOnWindowFocus: false,
-  });
+  useGetPokemon((data: any) => setPokemonList(data));
 
-  const { data: moves } = useQuery({
-    queryKey: ["moves"],
-    queryFn: () =>
-      fetch(`${import.meta.env.VITE_BASE_URL}/moves`).then((res) => res.json()),
-    onSuccess: (data) => {
-      setMovesList(data);
-    },
-    refetchOnWindowFocus: false,
-  });
+  useGetMoves((data: any) => setMovesList(data));
 
-  const { data: routes } = useQuery({
-    queryKey: ["routes"],
-    queryFn: () =>
-      fetch(`${import.meta.env.VITE_BASE_URL}/game_routes`).then((res) =>
-        res.json()
-      ),
-    onSuccess: (data) => {
-      setRoutes(data);
-    },
-    refetchOnWindowFocus: false,
-  });
+  useGetRoutes((data: any) => setRoutes(data));
 
   return (
     <SnackBarProvider>
