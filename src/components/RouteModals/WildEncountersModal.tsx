@@ -9,8 +9,8 @@ import {
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import { useEditRoute } from "../../apis/routesApis";
 import { usePokemonStore, useRouteStore } from "../../stores";
 import { Encounters } from "../../types";
@@ -82,7 +82,7 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
     onSuccess: (data: any) => {
       close();
       setRoutes(data.routes);
-      toast("Successfully updated wild encounters");
+      notifications.show({ message: "Successfully updated wild encounters" });
     },
   });
 
@@ -180,7 +180,6 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
       <Button fullWidth mt={20} onClick={() => submitWildEncounters()}>
         Submit Wild Encounters
       </Button>
-      <ToastContainer />
     </Modal>
   );
 };

@@ -1,7 +1,6 @@
 import { Autocomplete, Button, Grid } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   useGetPokemonByName,
   useSavePokemonChanges,
@@ -28,11 +27,11 @@ const Pokemon = () => {
     pokemonName,
     pokemonChanges: pokemonChanges as PokemonChanges,
     onSuccess: () => {
-      toast("Changes Saved");
+      notifications.show({ message: "Changes Saved" });
       setPokemonChanges(null);
     },
     onError: () => {
-      toast("Error Saving changes");
+      notifications.show({ message: "Error Saving changes", color: "red" });
     },
   });
 
@@ -83,7 +82,6 @@ const Pokemon = () => {
           pokemonChanges={pokemonChanges}
         />
       )}
-      <ToastContainer position="bottom-center" />
     </>
   );
 };

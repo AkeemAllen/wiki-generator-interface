@@ -7,6 +7,7 @@ import {
   Navbar,
   Text,
 } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import {
   IconBallBasketball,
   IconDisc,
@@ -40,6 +41,7 @@ function App() {
   return (
     <SnackBarProvider>
       <MantineProvider withGlobalStyles withNormalizeCSS>
+        <Notifications />
         <AppShell
           header={
             <Header height={{ base: 70 }} p="xl">

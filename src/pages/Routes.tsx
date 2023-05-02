@@ -12,9 +12,9 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
 import {
   useAddNewRoute,
   useDeleteRoute,
@@ -123,19 +123,22 @@ const Routes = () => {
   const { mutate: addNewRoute } = useAddNewRoute((data) => {
     setRoutes(data.routes);
     setNewRouteName("");
-    toast("Route added successfully!");
+    notifications.show({ message: "Route added successfully!" });
     closeNewRouteNameModal();
   });
 
   const { mutate: deleteRoute } = useDeleteRoute((data) => {
     setRoutes(data.routes);
-    toast("Route deleted successfully!");
+    notifications.show({
+      message: "Route deleted successfully!",
+      color: "red",
+    });
   });
 
   const { mutate: editRouteName } = useEditRouteName((data) => {
     setRoutes(data.routes);
     setNewRouteName("");
-    toast("Route name changed successfully!");
+    notifications.show({ message: "Route name changed successfully!" });
     closeEditRouteNameModal();
   });
 
@@ -143,7 +146,10 @@ const Routes = () => {
     setRoutes(data.routes);
     setNewPosition(0);
     closeEditPositionModal();
-    toast("Route position changed successfully!");
+    notifications.show({
+      message: "Route position changed successfully!",
+      color: "red",
+    });
   });
 
   return (
@@ -261,7 +267,6 @@ const Routes = () => {
         close={closeWildEncountersModal}
         routeName={currentRoute}
       />
-      <ToastContainer />
     </>
   );
 };

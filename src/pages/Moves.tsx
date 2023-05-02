@@ -8,7 +8,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
-import { ToastContainer, toast } from "react-toastify";
+import { notifications } from "@mantine/notifications";
 import { useGetMovesByName, useSaveMoveChanges } from "../apis/movesApis";
 import { Types } from "../constants";
 import { useMovesStore } from "../stores/movesStore";
@@ -31,11 +31,11 @@ const Moves = () => {
     moveName,
     moveChanges: moveDetails as MoveDetails,
     onSuccess: () => {
-      toast("Changes Saved");
+      notifications.show({ message: "Changes Saved" });
       setMoveDetails(null);
     },
     onError: () => {
-      toast("Error Saving changes");
+      notifications.show({ message: "Error Saving changes", color: "red" });
     },
   });
 
@@ -124,7 +124,6 @@ const Moves = () => {
           </SimpleGrid>
         </>
       )}
-      <ToastContainer />
     </>
   );
 };
