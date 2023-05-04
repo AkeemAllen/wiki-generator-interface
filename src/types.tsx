@@ -60,8 +60,13 @@ export type Encounters = {
   [key: string]: TrainerOrWildPokemon[];
 };
 
+export type TrainerInfo = {
+  is_important: boolean;
+  pokemon: TrainerOrWildPokemon[];
+};
+
 export type Trainers = {
-  [key: string]: TrainerOrWildPokemon[];
+  [key: string]: TrainerInfo;
 };
 
 export type AreaLevels = {
@@ -71,7 +76,6 @@ export type AreaLevels = {
 export type RouteProperties = {
   wild_encounters?: Encounters;
   trainers?: Trainers;
-  important_trainers?: Trainers;
   wild_encounters_area_levels?: AreaLevels;
   position: number;
 };

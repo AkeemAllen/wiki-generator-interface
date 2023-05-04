@@ -1,5 +1,4 @@
 import {
-  Accordion,
   ActionIcon,
   Box,
   Button,
@@ -7,7 +6,6 @@ import {
   Grid,
   Modal,
   NumberInput,
-  rem,
   TextInput,
   Tooltip,
 } from "@mantine/core";
@@ -21,44 +19,18 @@ import {
   useEditRouteName,
   useUpdateRoutePosition,
 } from "../apis/routesApis";
+import RouteAccordion from "../components/RouteAccordion";
+import TrainersEncounterModal from "../components/RouteModals/TrainerEncountersModal";
 import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
 import { useRouteStore } from "../stores";
 
 const useStyles = createStyles((theme) => ({
-  root: {
-    backgroundColor:
-      theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-    borderRadius: theme.radius.sm,
-  },
-  item: {
-    backgroundColor:
-      theme.colorScheme === "dark"
-        ? theme.colors.dark[6]
-        : theme.colors.gray[0],
-    border: `${rem(1)} solid transparent`,
-    position: "relative",
-    zIndex: 0,
-    transition: "transform 150ms ease",
-
-    "&[data-active]": {
-      transform: "scale(1.03)",
-      backgroundColor:
-        theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-      boxShadow: theme.shadows.md,
-      borderColor:
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[4]
-          : theme.colors.gray[2],
-      borderRadius: theme.radius.md,
-      zIndex: 1,
-      // position: "absolute",
-    },
-  },
   box: {
     borderRadius: 4,
     color: theme.colors.blue[7],
     backgroundColor: theme.colors.blue[0],
     marginTop: 5,
+    padding: 10,
     ":hover": {
       cursor: "pointer",
       backgroundColor: theme.colors.blue[1],
@@ -113,6 +85,10 @@ const Routes = () => {
     { open: openWildEncountersModal, close: closeWildEncountersModal },
   ] = useDisclosure(false);
   const [
+    trainersEncountersModalOpen,
+    { open: openTrainersEncountersModal, close: closeTrainersEncountersModal },
+  ] = useDisclosure(false);
+  const [
     editPositionModalOpen,
     { open: openEditPositionModal, close: closeEditPositionModal },
   ] = useDisclosure(false);
@@ -161,73 +137,55 @@ const Routes = () => {
         {Object.keys(routes).map((routeName, index) => {
           return (
             <Grid.Col key={index} span={3}>
-              <Accordion
-                maw={420}
-                mx="auto"
-                variant="filled"
-                defaultValue="customization"
-                classNames={classes}
-                className={classes.root}
-              >
-                <Accordion.Item value={routeName}>
-                  <Accordion.Control>{routeName}</Accordion.Control>
-                  <Accordion.Panel>
-                    <Box
-                      className={classes.box}
-                      p={10}
+              <RouteAccordion routeName={routeName}>
+                <Box
+                  className={classes.box}
+                  onClick={() => {
+                    setCurrentRoute(routeName);
+                    openWildEncountersModal();
+                  }}
+                >
+                  Wild Encounters
+                </Box>
+                <Box
+                  className={classes.box}
+                  onClick={() => {
+                    setCurrentRoute(routeName);
+                    openTrainersEncountersModal();
+                  }}
+                >
+                  Trainers
+                </Box>
+                <Grid mt={5}>
+                  <Grid.Col span={2}>
+                    <ActionIcon
                       onClick={() => {
-                        setCurrentRoute(routeName);
-                        openWildEncountersModal();
+                        openEditRouteNameModal();
+                        setRouteNameToEdit(routeName);
                       }}
                     >
-                      Wild Encounters
-                    </Box>
-                    <Box
-                      className={classes.box}
-                      sx={{ borderRadius: 4 }}
-                      p={10}
-                    >
-                      Trainers
-                    </Box>
-                    <Box
-                      className={classes.box}
-                      sx={{ borderRadius: 4 }}
-                      p={10}
-                    >
-                      Important Trainers
-                    </Box>
-                    <Grid mt={5}>
-                      <Grid.Col span={2}>
-                        <ActionIcon
-                          onClick={() => {
-                            openEditRouteNameModal();
-                            setRouteNameToEdit(routeName);
-                          }}
-                        >
-                          <IconEdit />
-                        </ActionIcon>
-                      </Grid.Col>
-                      <Grid.Col span={2}>
-                        <ActionIcon onClick={() => deleteRoute(routeName)}>
-                          <IconTrash />
-                        </ActionIcon>
-                      </Grid.Col>
-                      <Grid.Col span={4}>
-                        <Tooltip label={"Click to edit position"}>
-                          <ActionIcon
-                            onClick={() => {
-                              openEditPositionModal();
-                              setRouteNameToEdit(routeName);
-                            }}
-                          >
-                            {routes[routeName].position}
-                          </ActionIcon>
-                        </Tooltip>
-                      </Grid.Col>
-                    </Grid>
-                  </Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
+                      <IconEdit />
+                    </ActionIcon>
+                  </Grid.Col>
+                  <Grid.Col span={2}>
+                    <ActionIcon onClick={() => deleteRoute(routeName)}>
+                      <IconTrash />
+                    </ActionIcon>
+                  </Grid.Col>
+                  <Grid.Col span={4}>
+                    <Tooltip label={"Click to edit position"}>
+                      <ActionIcon
+                        onClick={() => {
+                          openEditPositionModal();
+                          setRouteNameToEdit(routeName);
+                        }}
+                      >
+                        {routes[routeName].position}
+                      </ActionIcon>
+                    </Tooltip>
+                  </Grid.Col>
+                </Grid>
+              </RouteAccordion>
             </Grid.Col>
           );
         })}
@@ -266,6 +224,11 @@ const Routes = () => {
         opened={wildEncountersModalOpen}
         close={closeWildEncountersModal}
         routeName={currentRoute}
+      />
+      <TrainersEncounterModal
+        opened={trainersEncountersModalOpen}
+        routeName={currentRoute}
+        close={closeTrainersEncountersModal}
       />
     </>
   );

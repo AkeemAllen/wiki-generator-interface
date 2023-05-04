@@ -13,7 +13,7 @@ import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import { useEditRoute } from "../../apis/routesApis";
 import { usePokemonStore, useRouteStore } from "../../stores";
-import { Encounters } from "../../types";
+import { AreaLevels, Encounters } from "../../types";
 import { capitalize, isNullEmptyOrUndefined } from "../../utils";
 import PokemonCard from "../PokemonCard";
 
@@ -24,18 +24,17 @@ type ModalProps = {
 };
 
 const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
+  const routes = useRouteStore((state) => state.routes);
+  const setRoutes = useRouteStore((state) => state.setRoutes);
+  const pokemonList = usePokemonStore((state) => state.pokemonList);
+
   const [currentEncountertype, setCurrentEncountertype] =
     useInputState<string>("grass");
   const [pokemonName, setPokemonName] = useInputState<string>("");
-  const pokemonList = usePokemonStore((state) => state.pokemonList);
   const [encounterRate, setEncounterRate] = useState<number>(0);
-  const routes = useRouteStore((state) => state.routes);
-  const setRoutes = useRouteStore((state) => state.setRoutes);
-  const [areaLevels, setAreaLevels] = useState(
-    routes[routeName]?.wild_encounters_area_levels || {}
-  );
+  const [areaLevels, setAreaLevels] = useState<AreaLevels>({} as AreaLevels);
   const [wildEncounters, setWildEncounters] = useState<Encounters>(
-    { ...routes[routeName]?.wild_encounters } || {}
+    {} as Encounters
   );
 
   const addPokemonToEncountertype = () => {
@@ -157,19 +156,17 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
                 {wildEncounters[encounterType]?.map((pokemon, index) => {
                   return (
                     <Grid.Col key={index} span={2}>
-                      {pokemon.area_level === undefined && (
-                        <PokemonCard
-                          pokemonId={pokemon.id as number}
-                          pokemonName={pokemon.name as string}
-                          encounterRate={pokemon.encounter_rate as number}
-                          removePokemon={() =>
-                            removePokemonFromEncountertype(
-                              pokemon.name as string,
-                              encounterType
-                            )
-                          }
-                        />
-                      )}
+                      <PokemonCard
+                        pokemonId={pokemon.id as number}
+                        pokemonName={pokemon.name as string}
+                        encounterRate={pokemon.encounter_rate as number}
+                        removePokemon={() =>
+                          removePokemonFromEncountertype(
+                            pokemon.name as string,
+                            encounterType
+                          )
+                        }
+                      />
                     </Grid.Col>
                   );
                 })}

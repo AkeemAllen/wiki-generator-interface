@@ -1,12 +1,13 @@
 import { ActionIcon, Box, Card, Image } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { capitalize } from "../utils";
+import { capitalize, isNullEmptyOrUndefined } from "../utils";
 
 type PokemonCardProps = {
   removePokemon: () => void;
   pokemonName: string;
   pokemonId: number;
-  encounterRate: number;
+  encounterRate?: number;
+  level?: number;
 };
 
 const PokemonCard = ({
@@ -14,6 +15,7 @@ const PokemonCard = ({
   pokemonName,
   pokemonId,
   encounterRate,
+  level,
 }: PokemonCardProps) => {
   const getSpriteUrl = () => {
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
@@ -55,7 +57,11 @@ const PokemonCard = ({
         pt={2}
         pb={2}
       >
-        {capitalize(pokemonName)} {encounterRate}%
+        {capitalize(pokemonName)}
+        <br />
+        {!isNullEmptyOrUndefined(encounterRate)
+          ? `${encounterRate}%`
+          : `lv.${level}`}
       </Box>
     </Card>
   );

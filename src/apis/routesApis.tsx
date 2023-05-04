@@ -16,12 +16,10 @@ export const useGetRoutes = (onSuccess: (data: any) => void) => {
 export const useAddNewRoute = (onSuccess: (data: any) => void) => {
   return useMutation({
     mutationFn: (routeName: string) => {
-      let formatted_route_name = routeName.replace(" ", "_");
-
       return fetch(`${import.meta.env.VITE_BASE_URL}/game-route`, {
         method: "POST",
         body: JSON.stringify({
-          new_route_name: formatted_route_name,
+          new_route_name: routeName,
         }),
         headers: { "Content-Type": "application/json" },
       }).then((res) => res.json());
@@ -68,13 +66,12 @@ export const useDeleteRoute = (onSuccess: (data: any) => void) => {
 export const useEditRouteName = (onSuccess: (data: any) => void) => {
   return useMutation({
     mutationFn: ({ routeNameToEdit, newRouteName }: any) => {
-      let formatted_route_name = newRouteName.replace(" ", "_");
       return fetch(
         `${import.meta.env.VITE_BASE_URL}/game-route/edit-route-name/`,
         {
           method: "POST",
           body: JSON.stringify({
-            new_route_name: formatted_route_name,
+            new_route_name: newRouteName,
             current_route_name: routeNameToEdit,
           }),
           headers: { "Content-Type": "application/json" },
