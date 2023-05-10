@@ -17,8 +17,6 @@ import {
   useEditRouteName,
   useUpdateRoutePosition,
 } from "../apis/routesApis";
-import TrainersEncounterModal from "../components/RouteModals/TrainerEncountersModal";
-import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
 import { useRouteStore } from "../stores";
 
 const useStyles = createStyles((theme) => ({
@@ -222,16 +220,6 @@ const Routes = () => {
           Save Changes
         </Button>
       </Modal>
-      <WildEncountersModal
-        opened={wildEncountersModalOpen}
-        close={closeWildEncountersModal}
-        routeName={currentRoute}
-      />
-      <TrainersEncounterModal
-        opened={trainersEncountersModalOpen}
-        routeName={currentRoute}
-        close={closeTrainersEncountersModal}
-      />
     </>
   );
 };

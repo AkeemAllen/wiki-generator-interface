@@ -2,7 +2,6 @@ import {
   Autocomplete,
   Button,
   Grid,
-  Modal,
   NativeSelect,
   NumberInput,
   TextInput,
@@ -19,11 +18,9 @@ import PokemonCard from "../PokemonCard";
 
 type ModalProps = {
   routeName: string;
-  opened: boolean;
-  close: () => void;
 };
 
-const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
+const WildEncountersTab = ({ routeName }: ModalProps) => {
   const routes = useRouteStore((state) => state.routes);
   const setRoutes = useRouteStore((state) => state.setRoutes);
   const pokemonList = usePokemonStore((state) => state.pokemonList);
@@ -91,11 +88,7 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
   }, [routeName]);
 
   return (
-    <Modal withCloseButton={false} opened={opened} onClose={close} size={"90%"}>
-      <Title>{routeName}</Title>
-      <Title order={4} mt={20}>
-        Wild Encounters
-      </Title>
+    <>
       <Grid mt={5}>
         <Grid.Col span={2}>
           <NativeSelect
@@ -177,8 +170,8 @@ const WildEncountersModal = ({ routeName, opened, close }: ModalProps) => {
       <Button fullWidth mt={20} onClick={() => submitWildEncounters()}>
         Submit Wild Encounters
       </Button>
-    </Modal>
+    </>
   );
 };
 
-export default WildEncountersModal;
+export default WildEncountersTab;

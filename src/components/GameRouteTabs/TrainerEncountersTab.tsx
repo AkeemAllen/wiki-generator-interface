@@ -3,7 +3,6 @@ import {
   Button,
   Checkbox,
   Grid,
-  Modal,
   NumberInput,
   TextInput,
   Title,
@@ -20,11 +19,9 @@ import PokemonCard from "../PokemonCard";
 
 type ModalProps = {
   routeName: string;
-  opened: boolean;
-  close: () => void;
 };
 
-const TrainersEncounterModal = ({ routeName, opened, close }: ModalProps) => {
+const TrainersEncounterTab = ({ routeName }: ModalProps) => {
   const pokemonList = usePokemonStore((state) => state.pokemonList);
   const routes = useRouteStore((state) => state.routes);
   const setRoutes = useRouteStore((state) => state.setRoutes);
@@ -112,11 +109,7 @@ const TrainersEncounterModal = ({ routeName, opened, close }: ModalProps) => {
   }, [routeName]);
 
   return (
-    <Modal withCloseButton={false} opened={opened} onClose={close} size={"90%"}>
-      <Title>{routeName}</Title>
-      <Title order={4} mt={20}>
-        Trainers
-      </Title>
+    <>
       <Grid mt={5}>
         <Grid.Col span={2}>
           <TextInput
@@ -231,8 +224,8 @@ const TrainersEncounterModal = ({ routeName, opened, close }: ModalProps) => {
       <Button fullWidth mt={20} onClick={() => submitTrainers()}>
         Submit Trainers
       </Button>
-    </Modal>
+    </>
   );
 };
 
-export default TrainersEncounterModal;
+export default TrainersEncounterTab;
