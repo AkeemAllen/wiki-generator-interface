@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Card, Image } from "@mantine/core";
+import { ActionIcon, Box, Card } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { capitalize, isNullEmptyOrUndefined } from "../utils";
 
@@ -44,8 +44,13 @@ const PokemonCard = ({
       >
         <IconTrash onClick={removePokemon} />
       </ActionIcon>
-      <Card.Section>
-        <Image src={getSpriteUrl()} alt={pokemonName} />
+      <Card.Section sx={{ display: "grid" }}>
+        <img
+          src={getSpriteUrl()}
+          alt={pokemonName}
+          width={80}
+          style={{ justifySelf: "center" }}
+        />
       </Card.Section>
       <Box
         sx={{

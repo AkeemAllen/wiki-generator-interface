@@ -14,15 +14,15 @@ import {
   IconGitBranch,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import SnackBarProvider from "react-simple-snackbar";
+import { Link, Outlet } from "react-router-dom";
 import "./App.css";
 import { useGetMoves } from "./apis/movesApis";
 import { useGetPokemon } from "./apis/pokemonApis";
 import { useGetRoutes } from "./apis/routesApis";
 import NavButton from "./components/NavButton";
-import Moves from "./pages/Moves";
-import Pokemon from "./pages/Pokemon";
-import Routes from "./pages/Routes";
+// import Routes from "./pages/GameRoutes";
+// import Moves from "./pages/Moves";
+// import Pokemon from "./pages/Pokemon";
 import { useMovesStore, usePokemonStore, useRouteStore } from "./stores";
 
 function App() {
@@ -39,60 +39,65 @@ function App() {
   useGetRoutes((data: any) => setRoutes(data));
 
   return (
-    <SnackBarProvider>
-      <MantineProvider withGlobalStyles withNormalizeCSS>
-        <Notifications />
-        <AppShell
-          header={
-            <Header height={{ base: 70 }} p="xl">
-              <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-                <Burger
-                  opened={navBarOpened}
-                  onClick={() => setNavBarOpened((o) => !o)}
-                  size="sm"
-                  mr="xl"
-                />
-              </MediaQuery>
-              <Text>Wiki Generator Interface</Text>
-            </Header>
-          }
-          navbarOffsetBreakpoint="sm"
-          navbar={
-            <Navbar
-              p="md"
-              hiddenBreakpoint="sm"
-              hidden={!navBarOpened}
-              width={{ sm: 200, lg: 300 }}
-            >
+    <MantineProvider withGlobalStyles withNormalizeCSS>
+      <Notifications />
+      <AppShell
+        header={
+          <Header height={{ base: 70 }} p="xl">
+            <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+              <Burger
+                opened={navBarOpened}
+                onClick={() => setNavBarOpened((o) => !o)}
+                size="sm"
+                mr="xl"
+              />
+            </MediaQuery>
+            <Text>Wiki Generator Interface</Text>
+          </Header>
+        }
+        navbarOffsetBreakpoint="sm"
+        navbar={
+          <Navbar
+            p="md"
+            hiddenBreakpoint="sm"
+            hidden={!navBarOpened}
+            width={{ sm: 200, lg: 300 }}
+          >
+            <Link to={"/pokemon"} style={{ textDecoration: "none" }}>
               <NavButton
                 text="Pokemon"
                 color="blue"
+                isActive={currentPage === "pokemon"}
                 icon={<IconBallBasketball size={"1rem"} />}
                 onClick={() => setCurrentPage("pokemon")}
               />
+            </Link>
 
+            <Link to={"/moves"} style={{ textDecoration: "none" }}>
               <NavButton
                 text="Moves"
                 color="teal"
+                isActive={currentPage === "moves"}
                 icon={<IconDisc size={"1rem"} />}
                 onClick={() => setCurrentPage("moves")}
               />
+            </Link>
 
+            <Link to={"/game-routes"} style={{ textDecoration: "none" }}>
               <NavButton
-                text="Routes"
+                text="GameRoutes"
                 color="yellow"
+                isActive={currentPage === "game-routes"}
                 icon={<IconGitBranch size={"1rem"} />}
-                onClick={() => setCurrentPage("routes")}
+                onClick={() => setCurrentPage("game-routes")}
               />
-            </Navbar>
-          }
-        >
-          {currentPage === "pokemon" && <Pokemon />}
-          {currentPage === "moves" && <Moves />}
-          {currentPage === "routes" && <Routes />}
-        </AppShell>
-      </MantineProvider>
-    </SnackBarProvider>
+            </Link>
+          </Navbar>
+        }
+      >
+        <Outlet />
+      </AppShell>
+    </MantineProvider>
   );
 }
 

@@ -7,6 +7,7 @@ import {
   NumberInput,
   TextInput,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -38,6 +39,7 @@ const TrainersEncounterModal = ({ routeName, opened, close }: ModalProps) => {
       return {
         ...trainers,
         [currentTrainer]: {
+          sprite_url: trainers[currentTrainer]?.sprite_url ?? "",
           is_important: trainers[currentTrainer]?.is_important ?? false,
           pokemon: [
             ...trainers[currentTrainer]?.pokemon,
@@ -61,6 +63,18 @@ const TrainersEncounterModal = ({ routeName, opened, close }: ModalProps) => {
         [trainer]: {
           ...trainers[trainer],
           is_important: isImportant,
+        },
+      };
+    });
+  };
+
+  const updateTrainerSprite = (trainer: string, sprite: string) => {
+    setTrainers((trainers: Trainers) => {
+      return {
+        ...trainers,
+        [trainer]: {
+          ...trainers[trainer],
+          sprite_url: `https://play.pokemonshowdown.com/sprites/trainers/${sprite}.png`,
         },
       };
     });
@@ -166,6 +180,31 @@ const TrainersEncounterModal = ({ routeName, opened, close }: ModalProps) => {
                     }}
                   />
                 </Grid.Col>
+                {trainers[trainer].is_important && (
+                  <Grid.Col span={3} mt={10}>
+                    <Tooltip label="Use names for sprites on https://play.pokemonshowdown.com/sprites/trainers/">
+                      <TextInput
+                        placeholder="Set a sprite name"
+                        defaultValue={trainers[trainer]?.sprite_url || ""}
+                        // onChange={(e) =>
+                        //   updateTrainerSprite(trainer, e.target.value)
+                        // }
+                        onKeyDown={(e) => {
+                          // console.log(e.target.value);
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            updateTrainerSprite(trainer, e.target.value);
+                          }
+                        }}
+                        // onKeyUp={(e) => {
+                        //   if (e.key === "Enter") {
+                        //   }
+                        // }}
+                      />
+                    </Tooltip>
+                  </Grid.Col>
+                )}
               </Grid>
               <Grid mt={10}>
                 {trainers[trainer].pokemon.map((pokemon, index) => {

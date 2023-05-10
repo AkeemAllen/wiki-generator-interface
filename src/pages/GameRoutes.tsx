@@ -1,25 +1,22 @@
 import {
-  ActionIcon,
-  Box,
   Button,
   createStyles,
   Grid,
   Modal,
   NumberInput,
   TextInput,
-  Tooltip,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   useAddNewRoute,
   useDeleteRoute,
   useEditRouteName,
   useUpdateRoutePosition,
 } from "../apis/routesApis";
-import RouteAccordion from "../components/RouteAccordion";
 import TrainersEncounterModal from "../components/RouteModals/TrainerEncountersModal";
 import WildEncountersModal from "../components/RouteModals/WildEncountersModal";
 import { useRouteStore } from "../stores";
@@ -137,56 +134,61 @@ const Routes = () => {
         {Object.keys(routes).map((routeName, index) => {
           return (
             <Grid.Col key={index} span={3}>
-              <RouteAccordion routeName={routeName}>
-                <Box
-                  className={classes.box}
-                  onClick={() => {
-                    setCurrentRoute(routeName);
-                    openWildEncountersModal();
-                  }}
-                >
-                  Wild Encounters
-                </Box>
-                <Box
-                  className={classes.box}
-                  onClick={() => {
-                    setCurrentRoute(routeName);
-                    openTrainersEncountersModal();
-                  }}
-                >
-                  Trainers
-                </Box>
-                <Grid mt={5}>
-                  <Grid.Col span={2}>
-                    <ActionIcon
-                      onClick={() => {
-                        openEditRouteNameModal();
-                        setRouteNameToEdit(routeName);
-                      }}
-                    >
-                      <IconEdit />
-                    </ActionIcon>
-                  </Grid.Col>
-                  <Grid.Col span={2}>
-                    <ActionIcon onClick={() => deleteRoute(routeName)}>
-                      <IconTrash />
-                    </ActionIcon>
-                  </Grid.Col>
-                  <Grid.Col span={4}>
-                    <Tooltip label={"Click to edit position"}>
-                      <ActionIcon
-                        onClick={() => {
-                          openEditPositionModal();
-                          setRouteNameToEdit(routeName);
-                        }}
-                      >
-                        {routes[routeName].position}
-                      </ActionIcon>
-                    </Tooltip>
-                  </Grid.Col>
-                </Grid>
-              </RouteAccordion>
+              <Link to={`${routeName}`} style={{ textDecoration: "none" }}>
+                <Button fullWidth>{routeName}</Button>
+              </Link>
             </Grid.Col>
+            // <Grid.Col key={index} span={3}>
+            //   <RouteAccordion routeName={routeName}>
+            //     <Box
+            //       className={classes.box}
+            //       onClick={() => {
+            //         setCurrentRoute(routeName);
+            //         openWildEncountersModal();
+            //       }}
+            //     >
+            //       Wild Encounters
+            //     </Box>
+            //     <Box
+            //       className={classes.box}
+            //       onClick={() => {
+            //         setCurrentRoute(routeName);
+            //         openTrainersEncountersModal();
+            //       }}
+            //     >
+            //       Trainers
+            //     </Box>
+            //     <Grid mt={5}>
+            //       <Grid.Col span={2}>
+            //         <ActionIcon
+            //           onClick={() => {
+            //             openEditRouteNameModal();
+            //             setRouteNameToEdit(routeName);
+            //           }}
+            //         >
+            //           <IconEdit />
+            //         </ActionIcon>
+            //       </Grid.Col>
+            //       <Grid.Col span={2}>
+            //         <ActionIcon onClick={() => deleteRoute(routeName)}>
+            //           <IconTrash />
+            //         </ActionIcon>
+            //       </Grid.Col>
+            //       <Grid.Col span={4}>
+            //         <Tooltip label={"Click to edit position"}>
+            //           <ActionIcon
+            //             onClick={() => {
+            //               openEditPositionModal();
+            //               setRouteNameToEdit(routeName);
+            //             }}
+            //           >
+            //             {routes[routeName].position}
+            //           </ActionIcon>
+            //         </Tooltip>
+            //       </Grid.Col>
+            //     </Grid>
+            //   </RouteAccordion>
+            // </Grid.Col>
           );
         })}
       </Grid>

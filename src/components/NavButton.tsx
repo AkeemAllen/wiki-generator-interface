@@ -1,13 +1,21 @@
 import { Group, Text, ThemeIcon, UnstyledButton } from "@mantine/core";
+import { ReactNode } from "react";
 
 type NavButtonProps = {
   color: string;
   text: string;
-  icon: React.ElementRef<any>;
-  onClick: Function;
+  icon: ReactNode;
+  onClick: () => void;
+  isActive?: boolean;
 };
 
-const NavButton = ({ color, text, icon, onClick }: NavButtonProps) => {
+const NavButton = ({
+  color,
+  text,
+  icon,
+  onClick,
+  isActive = false,
+}: NavButtonProps) => {
   return (
     <UnstyledButton
       sx={(theme) => ({
@@ -15,14 +23,14 @@ const NavButton = ({ color, text, icon, onClick }: NavButtonProps) => {
         width: "100%",
         padding: theme.spacing.xs,
         borderRadius: theme.radius.sm,
+        backgroundColor: isActive ? theme.colors.blue[0] : "transparent",
         color:
           theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
 
         "&:hover": {
-          backgroundColor:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[6]
-              : theme.colors.gray[0],
+          backgroundColor: isActive
+            ? theme.colors.blue[0]
+            : theme.colors.gray[0],
         },
       })}
       onClick={onClick}
