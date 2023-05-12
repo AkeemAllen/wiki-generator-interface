@@ -78,18 +78,20 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
   };
 
   const removePokemonFromTrainer = (pokemonName: string, trainer: string) => {
-    // setTrainers((trainers: Trainers) => {
-    //   let currentTrainers = {
-    //     ...trainers,
-    //     [trainer]: trainers[trainer].pokemon.filter(
-    //       (p) => p.name !== pokemonName
-    //     ),
-    //   };
-    //   if (currentTrainers[trainer].length === 0) {
-    //     delete currentTrainers[trainer];
-    //   }
-    //   return currentTrainers;
-    // });
+    let currentTrainers = {
+      ...trainers,
+      [trainer]: {
+        ...trainers[trainer],
+        pokemon: trainers[trainer].pokemon.filter(
+          (p) => p.name !== pokemonName
+        ),
+      },
+    };
+    console.log(currentTrainers[trainer].pokemon.length);
+    if (currentTrainers[trainer].pokemon.length === 0) {
+      delete currentTrainers[trainer];
+    }
+    setTrainers(currentTrainers);
   };
 
   const { mutate: submitTrainers } = useEditRoute({
@@ -179,21 +181,13 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
                       <TextInput
                         placeholder="Set a sprite name"
                         defaultValue={trainers[trainer]?.sprite_url || ""}
-                        // onChange={(e) =>
-                        //   updateTrainerSprite(trainer, e.target.value)
-                        // }
                         onKeyDown={(e) => {
-                          // console.log(e.target.value);
                           if (e.key === "Enter") {
                             e.preventDefault();
                             e.stopPropagation();
                             updateTrainerSprite(trainer, e.target.value);
                           }
                         }}
-                        // onKeyUp={(e) => {
-                        //   if (e.key === "Enter") {
-                        //   }
-                        // }}
                       />
                     </Tooltip>
                   </Grid.Col>
@@ -204,6 +198,12 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
                   return (
                     <Grid.Col span={2} key={index}>
                       <PokemonCard
+                        belongsToImportantTrainer={
+                          trainers[trainer].is_important
+                        }
+                        trainers={trainers}
+                        trainerName={trainer}
+                        setTrainers={setTrainers}
                         pokemonId={pokemon.id as number}
                         pokemonName={pokemon.name as string}
                         removePokemon={() =>

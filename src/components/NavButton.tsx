@@ -5,17 +5,10 @@ type NavButtonProps = {
   color: string;
   text: string;
   icon: ReactNode;
-  onClick: () => void;
   isActive?: boolean;
 };
 
-const NavButton = ({
-  color,
-  text,
-  icon,
-  onClick,
-  isActive = false,
-}: NavButtonProps) => {
+const NavButton = ({ color, text, icon, isActive = false }: NavButtonProps) => {
   return (
     <UnstyledButton
       sx={(theme) => ({
@@ -33,7 +26,6 @@ const NavButton = ({
             : theme.colors.gray[0],
         },
       })}
-      onClick={onClick}
     >
       <Group>
         <ThemeIcon color={color} variant="light">

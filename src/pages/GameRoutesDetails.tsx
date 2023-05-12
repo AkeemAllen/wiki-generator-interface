@@ -4,10 +4,6 @@ import { useLoaderData } from "react-router";
 import TrainersEncounterTab from "../components/GameRouteTabs/TrainerEncountersTab";
 import WildEncountersTab from "../components/GameRouteTabs/WildEncountersTab";
 
-type GameRoutesDetailsProps = {
-  routeName: string;
-};
-
 export async function loader({ params }: any) {
   return {
     routeName: params.routeName,

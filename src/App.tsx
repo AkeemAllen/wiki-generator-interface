@@ -14,23 +14,21 @@ import {
   IconGitBranch,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import "./App.css";
 import { useGetMoves } from "./apis/movesApis";
 import { useGetPokemon } from "./apis/pokemonApis";
 import { useGetRoutes } from "./apis/routesApis";
 import NavButton from "./components/NavButton";
-// import Routes from "./pages/GameRoutes";
-// import Moves from "./pages/Moves";
-// import Pokemon from "./pages/Pokemon";
 import { useMovesStore, usePokemonStore, useRouteStore } from "./stores";
 
 function App() {
-  const [navBarOpened, setNavBarOpened] = useState(false);
-  const [currentPage, setCurrentPage] = useState("pokemon");
   const setPokemonList = usePokemonStore((state) => state.setPokemonList);
   const setMovesList = useMovesStore((state) => state.setMovesList);
   const setRoutes = useRouteStore((state) => state.setRoutes);
+  const { pathname } = useLocation();
+
+  const [navBarOpened, setNavBarOpened] = useState(false);
 
   useGetPokemon((data: any) => setPokemonList(data));
 
@@ -67,9 +65,8 @@ function App() {
               <NavButton
                 text="Pokemon"
                 color="blue"
-                isActive={currentPage === "pokemon"}
+                isActive={pathname === "/pokemon"}
                 icon={<IconBallBasketball size={"1rem"} />}
-                onClick={() => setCurrentPage("pokemon")}
               />
             </Link>
 
@@ -77,9 +74,8 @@ function App() {
               <NavButton
                 text="Moves"
                 color="teal"
-                isActive={currentPage === "moves"}
+                isActive={pathname.includes("/moves")}
                 icon={<IconDisc size={"1rem"} />}
-                onClick={() => setCurrentPage("moves")}
               />
             </Link>
 
@@ -87,9 +83,8 @@ function App() {
               <NavButton
                 text="GameRoutes"
                 color="yellow"
-                isActive={currentPage === "game-routes"}
+                isActive={pathname.includes("/game-routes")}
                 icon={<IconGitBranch size={"1rem"} />}
-                onClick={() => setCurrentPage("game-routes")}
               />
             </Link>
           </Navbar>
