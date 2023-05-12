@@ -198,9 +198,6 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
                   return (
                     <Grid.Col span={2} key={index}>
                       <PokemonCard
-                        belongsToImportantTrainer={
-                          trainers[trainer].is_important
-                        }
                         trainers={trainers}
                         trainerName={trainer}
                         setTrainers={setTrainers}
