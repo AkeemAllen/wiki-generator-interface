@@ -58,7 +58,7 @@ function App() {
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <Notifications />
+      <Notifications position="top-right" />
       <AppShell
         header={
           <Header height={{ base: 70 }} p="xl">

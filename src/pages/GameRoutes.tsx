@@ -11,10 +11,14 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconExternalLink, IconPlus } from "@tabler/icons-react";
+import { IconExternalLink, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAddNewRoute, useUpdateRoutePosition } from "../apis/routesApis";
+import {
+  useAddNewRoute,
+  useDeleteRoute,
+  useUpdateRoutePosition,
+} from "../apis/routesApis";
 import { useRouteStore } from "../stores";
 
 type RouteNameModalProps = {
@@ -82,6 +86,14 @@ const Routes = () => {
     closeNewRouteNameModal();
   });
 
+  const { mutate: deleteRoute } = useDeleteRoute((data) => {
+    setRoutes(data.routes);
+    notifications.show({
+      message: "Route deleted successfully!",
+      color: "red",
+    });
+  });
+
   const { mutate: updateRoutePosition } = useUpdateRoutePosition((data) => {
     setRoutes(data.routes);
     setNewPosition(0);
@@ -101,11 +113,11 @@ const Routes = () => {
           return (
             <Grid.Col key={index} span={3}>
               <Box className={classes.box}>
-                <Grid columns={24} sx={{ alignItems: "center" }}>
+                <Grid columns={25} sx={{ alignItems: "center" }}>
                   <Grid.Col span={12}>
                     <Title order={5}>{routeName}</Title>
                   </Grid.Col>
-                  <Grid.Col span={3} offset={4}>
+                  <Grid.Col span={3} offset={3}>
                     <Link
                       to={`${routeName}`}
                       style={{ textDecoration: "none" }}
@@ -116,6 +128,11 @@ const Routes = () => {
                     </Link>
                   </Grid.Col>
                   <Grid.Col span={3}>
+                    <ActionIcon color="gray">
+                      <IconTrash onClick={() => deleteRoute(routeName)} />
+                    </ActionIcon>
+                  </Grid.Col>
+                  <Grid.Col span={2}>
                     <Button
                       variant="light"
                       color="gray"
@@ -151,9 +168,10 @@ const Routes = () => {
           onChange={(e: number) => setNewPosition(e)}
         />
         <Button
+          mt={20}
           onClick={() => updateRoutePosition({ routeNameToEdit, newPosition })}
         >
-          Save Changes
+          Save Position
         </Button>
       </Modal>
     </>
