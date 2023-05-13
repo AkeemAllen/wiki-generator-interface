@@ -1,7 +1,17 @@
-import { Button, Grid, Modal, NumberInput, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Grid,
+  Modal,
+  NumberInput,
+  TextInput,
+  Title,
+  createStyles,
+} from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconPlus } from "@tabler/icons-react";
+import { IconExternalLink, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAddNewRoute, useUpdateRoutePosition } from "../apis/routesApis";
@@ -32,7 +42,24 @@ const RouteNameModal = ({
   );
 };
 
+const useStyles = createStyles((theme) => ({
+  box: {
+    backgroundColor:
+      theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+    boxShadow: theme.shadows.sm,
+    border: `1px solid`,
+    color: theme.colorScheme === "dark" ? theme.white : theme.black,
+    borderColor:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[4]
+        : theme.colors.gray[2],
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+  },
+}));
+
 const Routes = () => {
+  const { classes } = useStyles();
   const [newRouteName, setNewRouteName] = useInputState<string>("");
   const [newPosition, setNewPosition] = useState<number>(0);
   const [
@@ -61,7 +88,6 @@ const Routes = () => {
     closeEditPositionModal();
     notifications.show({
       message: "Route position changed successfully!",
-      color: "red",
     });
   });
 
@@ -74,9 +100,35 @@ const Routes = () => {
         {Object.keys(routes).map((routeName, index) => {
           return (
             <Grid.Col key={index} span={3}>
-              <Link to={`${routeName}`} style={{ textDecoration: "none" }}>
-                <Button fullWidth>{routeName}</Button>
-              </Link>
+              <Box className={classes.box}>
+                <Grid columns={24} sx={{ alignItems: "center" }}>
+                  <Grid.Col span={12}>
+                    <Title order={5}>{routeName}</Title>
+                  </Grid.Col>
+                  <Grid.Col span={3} offset={4}>
+                    <Link
+                      to={`${routeName}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <ActionIcon color="gray">
+                        <IconExternalLink />
+                      </ActionIcon>
+                    </Link>
+                  </Grid.Col>
+                  <Grid.Col span={3}>
+                    <Button
+                      variant="light"
+                      color="gray"
+                      onClick={() => {
+                        setRouteNameToEdit(routeName);
+                        openEditPositionModal();
+                      }}
+                    >
+                      {routes[routeName].position}
+                    </Button>
+                  </Grid.Col>
+                </Grid>
+              </Box>
             </Grid.Col>
           );
         })}
