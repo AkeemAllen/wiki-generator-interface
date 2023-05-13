@@ -16,16 +16,30 @@ import {
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import "./App.css";
+import { useGetAbilities } from "./apis/abilitiesApis";
+import { useGetItems } from "./apis/itemsApis";
 import { useGetMoves } from "./apis/movesApis";
+import { useGetNatures } from "./apis/naturesApis";
 import { useGetPokemon } from "./apis/pokemonApis";
 import { useGetRoutes } from "./apis/routesApis";
 import NavButton from "./components/NavButton";
-import { useMovesStore, usePokemonStore, useRouteStore } from "./stores";
+import {
+  useAbilityStore,
+  useItemsStore,
+  useMovesStore,
+  useNatureStore,
+  usePokemonStore,
+  useRouteStore,
+} from "./stores";
 
 function App() {
   const setPokemonList = usePokemonStore((state) => state.setPokemonList);
   const setMovesList = useMovesStore((state) => state.setMovesList);
   const setRoutes = useRouteStore((state) => state.setRoutes);
+  const setItemsList = useItemsStore((state) => state.setItemsList);
+  const setAbilityList = useAbilityStore((state) => state.setAbilityList);
+  const setNatureList = useNatureStore((state) => state.setNaturesList);
+
   const { pathname } = useLocation();
 
   const [navBarOpened, setNavBarOpened] = useState(false);
@@ -35,6 +49,12 @@ function App() {
   useGetMoves((data: any) => setMovesList(data));
 
   useGetRoutes((data: any) => setRoutes(data));
+
+  useGetItems((data: any) => setItemsList(data));
+
+  useGetAbilities((data: any) => setAbilityList(data));
+
+  useGetNatures((data: any) => setNatureList(data));
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>

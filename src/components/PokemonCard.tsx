@@ -11,7 +11,12 @@ import {
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useEffect } from "react";
-import { useMovesStore } from "../stores";
+import {
+  useAbilityStore,
+  useItemsStore,
+  useMovesStore,
+  useNatureStore,
+} from "../stores";
 import { Trainers } from "../types";
 import { capitalize, isNullEmptyOrUndefined } from "../utils";
 
@@ -41,6 +46,9 @@ const PokemonCard = ({
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
   };
   const movesList = useMovesStore((state) => state.movesList);
+  const naturesList = useNatureStore((state) => state.naturesList);
+  const abilityList = useAbilityStore((state) => state.abilityList);
+  const itemsList = useItemsStore((state) => state.itemsList);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [item, setItem] = useInputState<string>("");
@@ -182,7 +190,7 @@ const PokemonCard = ({
               label="Held Item"
               value={item}
               onChange={setItem}
-              data={["", "life orb", "sitrus berry"]}
+              data={itemsList}
               dropdownPosition={"bottom"}
               sx={{ zIndex: 10 }}
             />
@@ -190,7 +198,7 @@ const PokemonCard = ({
               label="Ability"
               value={ability}
               onChange={setAbility}
-              data={["", "blaze", "torrent"]}
+              data={abilityList}
             />
           </Grid.Col>
           <Grid.Col span={6}>
@@ -198,7 +206,7 @@ const PokemonCard = ({
               label="Nature"
               value={nature}
               onChange={setNature}
-              data={["", "jolly", "adamant"]}
+              data={naturesList}
               dropdownPosition={"bottom"}
             />
           </Grid.Col>
