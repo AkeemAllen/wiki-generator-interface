@@ -4,12 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  useAddNewRoute,
-  useDeleteRoute,
-  useEditRouteName,
-  useUpdateRoutePosition,
-} from "../apis/routesApis";
+import { useAddNewRoute, useUpdateRoutePosition } from "../apis/routesApis";
 import { useRouteStore } from "../stores";
 
 type RouteNameModalProps = {
@@ -44,10 +39,6 @@ const Routes = () => {
     newRouteNameModalOpen,
     { open: openNewRouteNameModal, close: closeNewRouteNameModal },
   ] = useDisclosure(false);
-  const [
-    editRouteNameModalOpen,
-    { open: openEditRouteNameModal, close: closeEditRouteNameModal },
-  ] = useDisclosure(false);
   const [routeNameToEdit, setRouteNameToEdit] = useState("");
   const [
     editPositionModalOpen,
@@ -62,21 +53,6 @@ const Routes = () => {
     setNewRouteName("");
     notifications.show({ message: "Route added successfully!" });
     closeNewRouteNameModal();
-  });
-
-  const { mutate: deleteRoute } = useDeleteRoute((data) => {
-    setRoutes(data.routes);
-    notifications.show({
-      message: "Route deleted successfully!",
-      color: "red",
-    });
-  });
-
-  const { mutate: editRouteName } = useEditRouteName((data) => {
-    setRoutes(data.routes);
-    setNewRouteName("");
-    notifications.show({ message: "Route name changed successfully!" });
-    closeEditRouteNameModal();
   });
 
   const { mutate: updateRoutePosition } = useUpdateRoutePosition((data) => {
@@ -109,13 +85,6 @@ const Routes = () => {
         isOpen={newRouteNameModalOpen}
         close={closeNewRouteNameModal}
         saveFunction={() => addNewRoute(newRouteName)}
-        routeName={newRouteName}
-        setRouteName={setNewRouteName}
-      />
-      <RouteNameModal
-        isOpen={editRouteNameModalOpen}
-        close={closeEditRouteNameModal}
-        saveFunction={() => editRouteName({ routeNameToEdit, newRouteName })}
         routeName={newRouteName}
         setRouteName={setNewRouteName}
       />

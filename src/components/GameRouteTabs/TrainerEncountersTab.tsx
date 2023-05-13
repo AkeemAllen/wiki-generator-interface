@@ -36,7 +36,7 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
       return {
         ...trainers,
         [currentTrainer]: {
-          sprite_url: trainers[currentTrainer]?.sprite_url ?? "",
+          sprite_name: trainers[currentTrainer]?.sprite_name ?? "",
           is_important: trainers[currentTrainer]?.is_important ?? false,
           pokemon: [
             ...trainers[currentTrainer]?.pokemon,

@@ -72,7 +72,7 @@ const PokemonCard = ({
       return {
         ...trainers,
         [trainerName]: {
-          sprite_url: trainers[trainerName]?.sprite_url ?? "",
+          sprite_name: trainers[trainerName]?.sprite_name ?? "",
           is_important: trainers[trainerName]?.is_important ?? false,
           pokemon: trainers[trainerName]?.pokemon.map((p) => {
             if (p.name === pokemonName) {
