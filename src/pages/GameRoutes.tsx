@@ -1,11 +1,4 @@
-import {
-  Button,
-  createStyles,
-  Grid,
-  Modal,
-  NumberInput,
-  TextInput,
-} from "@mantine/core";
+import { Button, Grid, Modal, NumberInput, TextInput } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
@@ -18,23 +11,6 @@ import {
   useUpdateRoutePosition,
 } from "../apis/routesApis";
 import { useRouteStore } from "../stores";
-
-const useStyles = createStyles((theme) => ({
-  box: {
-    borderRadius: 4,
-    color: theme.colors.blue[7],
-    backgroundColor: theme.colors.blue[0],
-    marginTop: 5,
-    padding: 10,
-    ":hover": {
-      cursor: "pointer",
-      backgroundColor: theme.colors.blue[1],
-      transform: "scale(1.03)",
-      transition: "background-color 0.2s ease",
-    },
-    transition: "background-color 0.2s ease",
-  },
-}));
 
 type RouteNameModalProps = {
   isOpen: boolean;
@@ -62,9 +38,7 @@ const RouteNameModal = ({
 };
 
 const Routes = () => {
-  const { classes } = useStyles();
   const [newRouteName, setNewRouteName] = useInputState<string>("");
-  const [currentRoute, setCurrentRoute] = useState<string>("");
   const [newPosition, setNewPosition] = useState<number>(0);
   const [
     newRouteNameModalOpen,
@@ -75,14 +49,6 @@ const Routes = () => {
     { open: openEditRouteNameModal, close: closeEditRouteNameModal },
   ] = useDisclosure(false);
   const [routeNameToEdit, setRouteNameToEdit] = useState("");
-  const [
-    wildEncountersModalOpen,
-    { open: openWildEncountersModal, close: closeWildEncountersModal },
-  ] = useDisclosure(false);
-  const [
-    trainersEncountersModalOpen,
-    { open: openTrainersEncountersModal, close: closeTrainersEncountersModal },
-  ] = useDisclosure(false);
   const [
     editPositionModalOpen,
     { open: openEditPositionModal, close: closeEditPositionModal },
@@ -136,57 +102,6 @@ const Routes = () => {
                 <Button fullWidth>{routeName}</Button>
               </Link>
             </Grid.Col>
-            // <Grid.Col key={index} span={3}>
-            //   <RouteAccordion routeName={routeName}>
-            //     <Box
-            //       className={classes.box}
-            //       onClick={() => {
-            //         setCurrentRoute(routeName);
-            //         openWildEncountersModal();
-            //       }}
-            //     >
-            //       Wild Encounters
-            //     </Box>
-            //     <Box
-            //       className={classes.box}
-            //       onClick={() => {
-            //         setCurrentRoute(routeName);
-            //         openTrainersEncountersModal();
-            //       }}
-            //     >
-            //       Trainers
-            //     </Box>
-            //     <Grid mt={5}>
-            //       <Grid.Col span={2}>
-            //         <ActionIcon
-            //           onClick={() => {
-            //             openEditRouteNameModal();
-            //             setRouteNameToEdit(routeName);
-            //           }}
-            //         >
-            //           <IconEdit />
-            //         </ActionIcon>
-            //       </Grid.Col>
-            //       <Grid.Col span={2}>
-            //         <ActionIcon onClick={() => deleteRoute(routeName)}>
-            //           <IconTrash />
-            //         </ActionIcon>
-            //       </Grid.Col>
-            //       <Grid.Col span={4}>
-            //         <Tooltip label={"Click to edit position"}>
-            //           <ActionIcon
-            //             onClick={() => {
-            //               openEditPositionModal();
-            //               setRouteNameToEdit(routeName);
-            //             }}
-            //           >
-            //             {routes[routeName].position}
-            //           </ActionIcon>
-            //         </Tooltip>
-            //       </Grid.Col>
-            //     </Grid>
-            //   </RouteAccordion>
-            // </Grid.Col>
           );
         })}
       </Grid>

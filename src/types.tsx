@@ -63,7 +63,7 @@ export type Encounters = {
 export type TrainerInfo = {
   is_important: boolean;
   pokemon: TrainerOrWildPokemon[];
-  sprite_url: string;
+  sprite_name: string;
 };
 
 export type Trainers = {

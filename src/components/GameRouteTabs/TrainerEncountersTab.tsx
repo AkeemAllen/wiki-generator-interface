@@ -71,7 +71,7 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
         ...trainers,
         [trainer]: {
           ...trainers[trainer],
-          sprite_url: `https://play.pokemonshowdown.com/sprites/trainers/${sprite}.png`,
+          sprite_name: sprite,
         },
       };
     });
@@ -180,7 +180,7 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
                     <Tooltip label="Use names for sprites on https://play.pokemonshowdown.com/sprites/trainers/">
                       <TextInput
                         placeholder="Set a sprite name"
-                        defaultValue={trainers[trainer]?.sprite_url || ""}
+                        defaultValue={trainers[trainer]?.sprite_name || ""}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
