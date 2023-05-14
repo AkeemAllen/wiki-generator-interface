@@ -1,11 +1,12 @@
-import { Autocomplete, Button, Grid } from "@mantine/core";
+import { Autocomplete, Button, Grid, Image, Tabs } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import {
   useGetPokemonByName,
   useSavePokemonChanges,
 } from "../apis/pokemonApis";
-import PokemonModificationView from "../components/PokemonModificationView";
+import MovesTab from "../components/PokemonTabs/MovesTab";
+import StatsAbilitiesEvoTab from "../components/PokemonTabs/StatsAbilityEvoTab";
 import { usePokemonStore } from "../stores";
 import { PokemonChanges, PokemonData } from "../types";
 import { isNullEmptyOrUndefined } from "../utils";
@@ -16,6 +17,7 @@ const Pokemon = () => {
   const [pokemonChanges, setPokemonChanges] = useState<PokemonChanges | null>(
     null
   );
+  const [activeTab, setActiveTab] = useState<string | null>("moves");
   const pokemonList = usePokemonStore((state) => state.pokemonList);
 
   const { refetch, isLoading } = useGetPokemonByName({
@@ -75,13 +77,36 @@ const Pokemon = () => {
           </Button>
         </Grid.Col>
       </Grid>
+      <Image src={pokemonData?.sprite} maw={200} />
       {!isLoading && pokemonData && (
+        <Tabs mt={20} value={activeTab} onTabChange={setActiveTab}>
+          <Tabs.List>
+            <Tabs.Tab value="stats-abilities-evo">Stats_Abilities_Evo</Tabs.Tab>
+            <Tabs.Tab value="moves">Moves</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value="stats-abilities-evo">
+            <StatsAbilitiesEvoTab
+              pokemonData={pokemonData}
+              setPokemonChanges={setPokemonChanges}
+              pokemonChanges={pokemonChanges}
+            />
+          </Tabs.Panel>
+          <Tabs.Panel value="moves">
+            <MovesTab
+              pokemonChanges={pokemonChanges}
+              pokemonData={pokemonData}
+              setPokemonChanges={setPokemonChanges}
+            />
+          </Tabs.Panel>
+        </Tabs>
+      )}
+      {/* {!isLoading && pokemonData && (
         <PokemonModificationView
           pokemonData={pokemonData}
           setPokemonChanges={setPokemonChanges}
           pokemonChanges={pokemonChanges}
         />
-      )}
+      )} */}
     </>
   );
 };

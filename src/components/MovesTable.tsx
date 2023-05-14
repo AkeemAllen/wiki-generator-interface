@@ -37,7 +37,7 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
   const [newMove, setNewMove] = useState<NewMove>({
     move_name: "",
     level_learned_at: 0,
-    learn_method: "machine",
+    learn_method: "level-up",
   } as NewMove);
   const [searchTerm, setSearchTerm] = useInputState<string>("");
   const movesList = useMovesStore((state) => state.movesList);
@@ -66,10 +66,11 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
     });
   };
 
-  const addNewMove = (move_name: string) => {
+  const addNewMove = (newMove: NewMove) => {
     setMoves((moves: Move) => {
+      console.log(newMove);
       return {
-        [move_name]: {
+        [newMove.move_name]: {
           level_learned_at: newMove.level_learned_at,
           learn_method: newMove.learn_method,
         },
@@ -80,7 +81,7 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
     setNewMove({
       move_name: "",
       level_learned_at: 0,
-      learn_method: "machine",
+      learn_method: "level-up",
     } as NewMove);
   };
 
@@ -162,7 +163,13 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
             })}
         </tbody>
       </Table>
-      <Modal opened={opened} onClose={close} title={"Add New Move"} centered>
+      <Modal
+        opened={opened}
+        withCloseButton={false}
+        onClose={close}
+        title={"Add New Move"}
+        centered
+      >
         <Autocomplete
           value={newMove.move_name}
           onChange={(value) => setNewMove({ ...newMove, move_name: value })}
@@ -189,13 +196,14 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
             }
           />
         )}
-        <Button onClick={() => addNewMove(newMove.move_name)}>Save</Button>
+        <Button onClick={() => addNewMove(newMove)}>Save</Button>
       </Modal>
       <Modal
         opened={editMoveModalOpened}
         onClose={closeEditMoveModal}
         title={"Edit Move"}
         centered
+        withCloseButton={false}
       >
         <TextInput value={moveToEdit} disabled label="Move Name" />
         <NativeSelect

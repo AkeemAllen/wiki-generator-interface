@@ -111,7 +111,7 @@ const Routes = () => {
       <Grid mt={50}>
         {Object.keys(routes).map((routeName, index) => {
           return (
-            <Grid.Col key={index} span={3}>
+            <Grid.Col key={index} span={4}>
               <Box className={classes.box}>
                 <Grid columns={25} sx={{ alignItems: "center" }}>
                   <Grid.Col span={12}>

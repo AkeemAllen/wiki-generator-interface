@@ -15,8 +15,12 @@ export async function loader({ params }: any) {
   };
 }
 
+type LoaderData = {
+  routeName: string;
+};
+
 const GameRoutesDetails = () => {
-  const { routeName } = useLoaderData();
+  const { routeName } = useLoaderData() as LoaderData;
   const setRoutes = useRouteStore((state) => state.setRoutes);
   const navigate = useNavigate();
 

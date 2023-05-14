@@ -183,9 +183,20 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
                         defaultValue={trainers[trainer]?.sprite_name || ""}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
+                            const { value, blur } =
+                              e.target as HTMLInputElement;
                             e.preventDefault();
                             e.stopPropagation();
-                            updateTrainerSprite(trainer, e.target.value);
+                            updateTrainerSprite(trainer, value);
+                            notifications.show({
+                              message: "Sprite name updated successfully",
+                            });
+                          }
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.key === "Escape" || e.key === "Enter") {
+                            const { blur } = e.target as HTMLInputElement;
+                            blur();
                           }
                         }}
                       />
