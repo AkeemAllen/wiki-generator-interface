@@ -5,6 +5,7 @@ import GameRoutesDetails, {
   loader as routeLoader,
 } from "./pages/GameRoutesDetails";
 import Moves from "./pages/Moves";
+import MultiplePokemon from "./pages/MultiplePokemon";
 import Pokemon from "./pages/Pokemon";
 import ErrorPage from "./pages/error-page";
 
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: "pokemon",
         element: <Pokemon />,
+      },
+      {
+        path: "multiple-pokemon",
+        element: <MultiplePokemon />,
       },
       {
         path: "moves",

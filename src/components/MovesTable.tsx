@@ -68,7 +68,6 @@ const MovesTable = ({ moves, setMoves }: MovesTableProps) => {
 
   const addNewMove = (newMove: NewMove) => {
     setMoves((moves: Move) => {
-      console.log(newMove);
       return {
         [newMove.move_name]: {
           level_learned_at: newMove.level_learned_at,

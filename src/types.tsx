@@ -24,13 +24,13 @@ export type Stats = {
 };
 
 export type PokemonChanges = {
-  id: number;
-  types: string[];
-  abilities: string[];
-  stats: Stats;
-  moves: Move;
-  machineMoves: string[];
-  evolution: string;
+  id?: number;
+  types?: string[];
+  abilities?: string[];
+  stats?: Stats;
+  moves?: Move;
+  machineMoves?: string[];
+  evolution?: string;
 };
 
 export type PokemonData = {

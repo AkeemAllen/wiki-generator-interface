@@ -62,7 +62,6 @@ const PokemonCard = ({
   ]);
 
   const handleMoveChange = (index: number, value: string) => {
-    console.log(index, value);
     pokemonMoves[index] = value;
     setPokemonMoves([...pokemonMoves]);
   };

@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { PokemonChanges } from "../types";
 
 export const useGetPokemon = (onSuccess: (data: any) => void) => {
   return useQuery({
@@ -25,14 +26,14 @@ export const useGetPokemonByName = ({ pokemonName, onSuccess }: any) => {
   });
 };
 
-export const useSavePokemonChanges = ({
-  pokemonName,
-  pokemonChanges,
-  onSuccess,
-  onError,
-}: any) => {
+type SavePokemonProps = {
+  pokemonName: string;
+  pokemonChanges: PokemonChanges;
+};
+
+export const useSavePokemonChanges = ({ onSuccess, onError }: any) => {
   return useMutation({
-    mutationFn: () => {
+    mutationFn: ({ pokemonName, pokemonChanges }: SavePokemonProps) => {
       return fetch(
         `${import.meta.env.VITE_BASE_URL}/pokemon/edit/${pokemonName}`,
         {

@@ -4,6 +4,7 @@ import {
   Checkbox,
   Grid,
   NumberInput,
+  ScrollArea,
   TextInput,
   Title,
   Tooltip,
@@ -33,13 +34,24 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
 
   const addPokemonToTrainer = () => {
     setTrainers((trainers: Trainers) => {
+      let sprite_name = "";
+      let is_important = false;
+      let existingPokemon = trainers[currentTrainer]?.pokemon ?? [];
+
+      if (!isNullEmptyOrUndefined(trainers[currentTrainer]?.sprite_name)) {
+        sprite_name = trainers[currentTrainer]?.sprite_name;
+      }
+      if (!isNullEmptyOrUndefined(trainers[currentTrainer]?.is_important)) {
+        is_important = trainers[currentTrainer]?.is_important;
+      }
+
       return {
         ...trainers,
         [currentTrainer]: {
-          sprite_name: trainers[currentTrainer]?.sprite_name ?? "",
-          is_important: trainers[currentTrainer]?.is_important ?? false,
+          sprite_name,
+          is_important,
           pokemon: [
-            ...trainers[currentTrainer]?.pokemon,
+            ...existingPokemon,
             {
               name: pokemonName,
               id: pokemonList?.find((p) => p.name === pokemonName)?.id,
@@ -87,7 +99,6 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
         ),
       },
     };
-    console.log(currentTrainers[trainer].pokemon.length);
     if (currentTrainers[trainer].pokemon.length === 0) {
       delete currentTrainers[trainer];
     }
@@ -151,84 +162,86 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
           </Button>
         </Grid.Col>
       </Grid>
-      {!isNullEmptyOrUndefined(trainers) &&
-        Object.keys(trainers).map((trainer, index) => {
-          return (
-            <div key={index}>
-              <Grid columns={24}>
-                <Grid.Col span={3}>
-                  <Title order={4} mt={20}>
-                    {capitalize(trainer)}
-                  </Title>
-                </Grid.Col>
-                <Grid.Col span={3}>
-                  <Checkbox
-                    mt={24}
-                    size={"xs"}
-                    label="Important Trainer"
-                    checked={trainers[trainer].is_important}
-                    onChange={() => {
-                      updateTrainerImportance(
-                        trainer,
-                        !trainers[trainer].is_important
-                      );
-                    }}
-                  />
-                </Grid.Col>
-                {trainers[trainer].is_important && (
-                  <Grid.Col span={3} mt={10}>
-                    <Tooltip label="Use names for sprites on https://play.pokemonshowdown.com/sprites/trainers/">
-                      <TextInput
-                        placeholder="Set a sprite name"
-                        defaultValue={trainers[trainer]?.sprite_name || ""}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            const { value, blur } =
-                              e.target as HTMLInputElement;
-                            e.preventDefault();
-                            e.stopPropagation();
-                            updateTrainerSprite(trainer, value);
-                            notifications.show({
-                              message: "Sprite name updated successfully",
-                            });
-                          }
-                        }}
-                        onKeyUp={(e) => {
-                          if (e.key === "Escape" || e.key === "Enter") {
-                            const { blur } = e.target as HTMLInputElement;
-                            blur();
-                          }
-                        }}
-                      />
-                    </Tooltip>
+      <ScrollArea.Autosize mah={800}>
+        {!isNullEmptyOrUndefined(trainers) &&
+          Object.keys(trainers).map((trainer, index) => {
+            return (
+              <div key={index}>
+                <Grid columns={24}>
+                  <Grid.Col span={3}>
+                    <Title order={4} mt={20}>
+                      {capitalize(trainer)}
+                    </Title>
                   </Grid.Col>
-                )}
-              </Grid>
-              <Grid mt={10}>
-                {trainers[trainer].pokemon.map((pokemon, index) => {
-                  return (
-                    <Grid.Col span={2} key={index}>
-                      <PokemonCard
-                        trainers={trainers}
-                        trainerName={trainer}
-                        setTrainers={setTrainers}
-                        pokemonId={pokemon.id as number}
-                        pokemonName={pokemon.name as string}
-                        removePokemon={() =>
-                          removePokemonFromTrainer(
-                            pokemon.name as string,
-                            trainer
-                          )
-                        }
-                        level={pokemon.level as number}
-                      />
+                  <Grid.Col span={3}>
+                    <Checkbox
+                      mt={24}
+                      size={"xs"}
+                      label="Important Trainer"
+                      checked={trainers[trainer].is_important}
+                      onChange={() => {
+                        updateTrainerImportance(
+                          trainer,
+                          !trainers[trainer].is_important
+                        );
+                      }}
+                    />
+                  </Grid.Col>
+                  {trainers[trainer].is_important && (
+                    <Grid.Col span={3} mt={10}>
+                      <Tooltip label="Use names for sprites on https://play.pokemonshowdown.com/sprites/trainers/">
+                        <TextInput
+                          placeholder="Set a sprite name"
+                          defaultValue={trainers[trainer]?.sprite_name || ""}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const { value, blur } =
+                                e.target as HTMLInputElement;
+                              e.preventDefault();
+                              e.stopPropagation();
+                              updateTrainerSprite(trainer, value);
+                              notifications.show({
+                                message: "Sprite name updated successfully",
+                              });
+                            }
+                          }}
+                          onKeyUp={(e) => {
+                            if (e.key === "Escape" || e.key === "Enter") {
+                              const { blur } = e.target as HTMLInputElement;
+                              blur();
+                            }
+                          }}
+                        />
+                      </Tooltip>
                     </Grid.Col>
-                  );
-                })}
-              </Grid>
-            </div>
-          );
-        })}
+                  )}
+                </Grid>
+                <Grid mt={10}>
+                  {trainers[trainer].pokemon.map((pokemon, index) => {
+                    return (
+                      <Grid.Col span={2} key={index}>
+                        <PokemonCard
+                          trainers={trainers}
+                          trainerName={trainer}
+                          setTrainers={setTrainers}
+                          pokemonId={pokemon.id as number}
+                          pokemonName={pokemon.name as string}
+                          removePokemon={() =>
+                            removePokemonFromTrainer(
+                              pokemon.name as string,
+                              trainer
+                            )
+                          }
+                          level={pokemon.level as number}
+                        />
+                      </Grid.Col>
+                    );
+                  })}
+                </Grid>
+              </div>
+            );
+          })}
+      </ScrollArea.Autosize>
       <Button fullWidth mt={20} onClick={() => submitTrainers()}>
         Submit Trainers
       </Button>

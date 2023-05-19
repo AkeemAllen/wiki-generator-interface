@@ -4,6 +4,7 @@ import {
   Grid,
   NativeSelect,
   NumberInput,
+  ScrollArea,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -26,7 +27,9 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
   const pokemonList = usePokemonStore((state) => state.pokemonList);
 
   const [currentEncountertype, setCurrentEncountertype] =
-    useInputState<string>("grass");
+    useInputState<string>("grass-normal");
+  const [specialEncounterArea, setSpecialEncounterArea] =
+    useInputState<string>("");
   const [pokemonName, setPokemonName] = useInputState<string>("");
   const [encounterRate, setEncounterRate] = useState<number>(0);
   const [areaLevels, setAreaLevels] = useState<AreaLevels>({} as AreaLevels);
@@ -36,10 +39,15 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
 
   const addPokemonToEncountertype = () => {
     setWildEncounters((wildEncounters: Encounters) => {
+      let encounterType = currentEncountertype;
+      if (currentEncountertype === "special-encounter") {
+        encounterType = specialEncounterArea;
+      }
+
       return {
         ...wildEncounters,
-        [currentEncountertype]: [
-          ...(wildEncounters[currentEncountertype] ?? []),
+        [encounterType]: [
+          ...(wildEncounters[encounterType] ?? []),
           {
             name: pokemonName,
             id: pokemonList?.find((p) => p.name === pokemonName)?.id,
@@ -96,9 +104,29 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
             placeholder="Encounter Type"
             onChange={(value) => setCurrentEncountertype(value)}
             value={currentEncountertype}
-            data={["surf", "grass", "fishing", "cave", "other"]}
+            data={[
+              "grass-normal",
+              "grass-doubles",
+              "grass-special",
+              "surf-normal",
+              "surf-special",
+              "fishing-normal",
+              "fishing-special",
+              "cave-normal",
+              "cave-special",
+              "special-encounter",
+            ]}
           />
         </Grid.Col>
+        {currentEncountertype === "special-encounter" && (
+          <Grid.Col>
+            <TextInput
+              label="Special Encounter Area"
+              value={specialEncounterArea}
+              onChange={setSpecialEncounterArea}
+            />
+          </Grid.Col>
+        )}
         <Grid.Col span={4}>
           <Autocomplete
             label="Pokemon for current encounter type"
@@ -126,47 +154,49 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
           </Button>
         </Grid.Col>
       </Grid>
-      {!isNullEmptyOrUndefined(wildEncounters) &&
-        Object.keys(wildEncounters).map((encounterType, index) => {
-          return (
-            <div key={index}>
-              <Title order={4} mt={20}>
-                {capitalize(encounterType)} Encounters{" "}
-              </Title>
-              <TextInput
-                placeholder="Level Range. Eg.'lv 1-5'"
-                mt={10}
-                sx={{ width: "12rem" }}
-                value={areaLevels[encounterType] || ""}
-                onChange={(e) =>
-                  setAreaLevels({
-                    ...areaLevels,
-                    [encounterType]: e.target.value,
-                  })
-                }
-              />
-              <Grid mt={10}>
-                {wildEncounters[encounterType]?.map((pokemon, index) => {
-                  return (
-                    <Grid.Col key={index} span={2}>
-                      <PokemonCard
-                        pokemonId={pokemon.id as number}
-                        pokemonName={pokemon.name as string}
-                        encounterRate={pokemon.encounter_rate as number}
-                        removePokemon={() =>
-                          removePokemonFromEncountertype(
-                            pokemon.name as string,
-                            encounterType
-                          )
-                        }
-                      />
-                    </Grid.Col>
-                  );
-                })}
-              </Grid>
-            </div>
-          );
-        })}
+      <ScrollArea.Autosize mah={800}>
+        {!isNullEmptyOrUndefined(wildEncounters) &&
+          Object.keys(wildEncounters).map((encounterType, index) => {
+            return (
+              <div key={index}>
+                <Title order={4} mt={20}>
+                  {capitalize(encounterType)} Encounters{" "}
+                </Title>
+                <TextInput
+                  placeholder="Level Range. Eg.'lv 1-5'"
+                  mt={10}
+                  sx={{ width: "12rem" }}
+                  value={areaLevels[encounterType] || ""}
+                  onChange={(e) =>
+                    setAreaLevels({
+                      ...areaLevels,
+                      [encounterType]: e.target.value,
+                    })
+                  }
+                />
+                <Grid mt={10}>
+                  {wildEncounters[encounterType]?.map((pokemon, index) => {
+                    return (
+                      <Grid.Col key={index} span={2}>
+                        <PokemonCard
+                          pokemonId={pokemon.id as number}
+                          pokemonName={pokemon.name as string}
+                          encounterRate={pokemon.encounter_rate as number}
+                          removePokemon={() =>
+                            removePokemonFromEncountertype(
+                              pokemon.name as string,
+                              encounterType
+                            )
+                          }
+                        />
+                      </Grid.Col>
+                    );
+                  })}
+                </Grid>
+              </div>
+            );
+          })}
+      </ScrollArea.Autosize>
       <Button fullWidth mt={20} onClick={() => submitWildEncounters()}>
         Submit Wild Encounters
       </Button>

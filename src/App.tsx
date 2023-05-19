@@ -89,6 +89,14 @@ function App() {
                 icon={<IconBallBasketball size={"1rem"} />}
               />
             </Link>
+            <Link to={"/multiple-pokemon"} style={{ textDecoration: "none" }}>
+              <NavButton
+                text="Multiple Pokemon"
+                color="blue"
+                isActive={pathname.includes("/multiple-pokemon")}
+                icon={<IconBallBasketball size={"1rem"} />}
+              />
+            </Link>
 
             <Link to={"/moves"} style={{ textDecoration: "none" }}>
               <NavButton

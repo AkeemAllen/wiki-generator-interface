@@ -26,8 +26,6 @@ const Pokemon = () => {
   });
 
   const { mutate: mutatePokemon } = useSavePokemonChanges({
-    pokemonName,
-    pokemonChanges: pokemonChanges as PokemonChanges,
     onSuccess: () => {
       notifications.show({ message: "Changes Saved" });
       setPokemonChanges(null);
@@ -43,7 +41,10 @@ const Pokemon = () => {
   };
 
   const saveChanges = () => {
-    mutatePokemon();
+    mutatePokemon({
+      pokemonName,
+      pokemonChanges: pokemonChanges as PokemonChanges,
+    });
   };
 
   return (
@@ -100,13 +101,6 @@ const Pokemon = () => {
           </Tabs.Panel>
         </Tabs>
       )}
-      {/* {!isLoading && pokemonData && (
-        <PokemonModificationView
-          pokemonData={pokemonData}
-          setPokemonChanges={setPokemonChanges}
-          pokemonChanges={pokemonChanges}
-        />
-      )} */}
     </>
   );
 };

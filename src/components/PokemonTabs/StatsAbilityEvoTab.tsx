@@ -62,7 +62,6 @@ const StatsAbilitiesEvoTab = ({
   }, [abilityOne, abilityTwo]);
 
   useUpdateEffect(() => {
-    console.log("stats changed");
     setPokemonChanges({
       ...pokemonChanges,
       stats: stats,
@@ -85,13 +84,17 @@ const StatsAbilitiesEvoTab = ({
               label={`Type 1`}
               value={typeOne}
               onChange={setTypeOne}
-              data={Object.keys(Types).map((key) => Types[key])}
+              data={Object.keys(Types).map(
+                (key: string) => Types[key as keyof typeof Types]
+              )}
             />
             <NativeSelect
               label={`Type 2`}
               value={typeTwo}
               onChange={setTypeTwo}
-              data={Object.keys(Types).map((key: string) => Types[key])}
+              data={Object.keys(Types).map(
+                (key: string) => Types[key as keyof typeof Types]
+              )}
             />
           </SimpleGrid>
           <SimpleGrid cols={2} mt="xl">
