@@ -78,6 +78,7 @@ const GameRoutesDetails = () => {
         <Tabs.List>
           <Tabs.Tab value="wild-encounters">Wild Encounters</Tabs.Tab>
           <Tabs.Tab value="trainer-encounters">Trainer Encounters</Tabs.Tab>
+          {/* <Tabs.Tab value="rival-encounters">Rival Encounters</Tabs.Tab> */}
         </Tabs.List>
 
         <Tabs.Panel value="wild-encounters">
@@ -86,6 +87,9 @@ const GameRoutesDetails = () => {
         <Tabs.Panel value="trainer-encounters">
           <TrainersEncounterTab routeName={routeName} />
         </Tabs.Panel>
+        {/* <Tabs.Panel value="rival-encounters">
+          <RivalsEncounterTab routeName={routeName} />
+        </Tabs.Panel> */}
       </Tabs>
     </>
   );
