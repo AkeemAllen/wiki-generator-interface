@@ -101,3 +101,20 @@ export const useUpdateRoutePosition = (onSuccess: (data: any) => void) => {
     onSuccess,
   });
 };
+
+export const useDuplicateRoute = (onSuccess: (data: any) => void) => {
+  return useMutation({
+    mutationFn: ({ routeName, newRouteName }: any) => {
+      return fetch(
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/game-route/duplicate/${routeName}/${newRouteName}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      ).then((res) => res.json());
+    },
+    onSuccess,
+  });
+};

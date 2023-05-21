@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Grid,
+  Menu,
   Modal,
   NumberInput,
   TextInput,
@@ -11,12 +12,17 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconExternalLink, IconPlus, IconTrash } from "@tabler/icons-react";
+import {
+  IconDotsVertical,
+  IconExternalLink,
+  IconPlus,
+} from "@tabler/icons-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useAddNewRoute,
   useDeleteRoute,
+  useDuplicateRoute,
   useUpdateRoutePosition,
 } from "../apis/routesApis";
 import { useRouteStore } from "../stores";
@@ -75,6 +81,7 @@ const Routes = () => {
     editPositionModalOpen,
     { open: openEditPositionModal, close: closeEditPositionModal },
   ] = useDisclosure(false);
+  const navigate = useNavigate();
 
   const setRoutes = useRouteStore((state) => state.setRoutes);
   const routes = useRouteStore((state) => state.routes);
@@ -84,6 +91,7 @@ const Routes = () => {
     setNewRouteName("");
     notifications.show({ message: "Route added successfully!" });
     closeNewRouteNameModal();
+    navigate(`${newRouteName}`);
   });
 
   const { mutate: deleteRoute } = useDeleteRoute((data) => {
@@ -103,6 +111,13 @@ const Routes = () => {
     });
   });
 
+  const { mutate: duplicateRoute } = useDuplicateRoute((data) => {
+    setRoutes(data.routes);
+    notifications.show({
+      message: "Route duplicated successfully!",
+    });
+  });
+
   return (
     <>
       <Button leftIcon={<IconPlus />} onClick={openNewRouteNameModal}>
@@ -113,7 +128,7 @@ const Routes = () => {
           return (
             <Grid.Col key={index} span={4}>
               <Box className={classes.box}>
-                <Grid columns={25} sx={{ alignItems: "center" }}>
+                <Grid columns={24} sx={{ alignItems: "center" }}>
                   <Grid.Col span={12}>
                     <Title order={5}>{routeName}</Title>
                   </Grid.Col>
@@ -128,11 +143,6 @@ const Routes = () => {
                     </Link>
                   </Grid.Col>
                   <Grid.Col span={3}>
-                    <ActionIcon color="gray">
-                      <IconTrash onClick={() => deleteRoute(routeName)} />
-                    </ActionIcon>
-                  </Grid.Col>
-                  <Grid.Col span={2}>
                     <Button
                       variant="light"
                       color="gray"
@@ -143,6 +153,31 @@ const Routes = () => {
                     >
                       {routes[routeName].position}
                     </Button>
+                  </Grid.Col>
+                  <Grid.Col span={3}>
+                    <Menu shadow="sm" width={200}>
+                      <Menu.Target>
+                        <ActionIcon color="gray">
+                          <IconDotsVertical />
+                        </ActionIcon>
+                      </Menu.Target>
+
+                      <Menu.Dropdown>
+                        <Menu.Item onClick={() => deleteRoute(routeName)}>
+                          Delete
+                        </Menu.Item>
+                        <Menu.Item
+                          onClick={() =>
+                            duplicateRoute({
+                              routeName,
+                              newRouteName: `${routeName} copy`,
+                            })
+                          }
+                        >
+                          Duplicate
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
                   </Grid.Col>
                 </Grid>
               </Box>
