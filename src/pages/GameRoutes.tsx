@@ -12,13 +12,9 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import {
-  IconDotsVertical,
-  IconExternalLink,
-  IconPlus,
-} from "@tabler/icons-react";
+import { IconDotsVertical, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   useAddNewRoute,
   useDeleteRoute,
@@ -65,6 +61,7 @@ const useStyles = createStyles((theme) => ({
         : theme.colors.gray[2],
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
   },
 }));
 
@@ -126,35 +123,17 @@ const Routes = () => {
       <Grid mt={50}>
         {Object.keys(routes).map((routeName, index) => {
           return (
-            <Grid.Col key={index} span={4}>
+            <Grid.Col key={index} span={3}>
               <Box className={classes.box}>
-                <Grid columns={24} sx={{ alignItems: "center" }}>
-                  <Grid.Col span={12}>
+                <Grid sx={{ alignItems: "center" }}>
+                  <Grid.Col
+                    span={10}
+                    onClick={() => navigate(`${routeName}`)}
+                    sx={{ "&:hover": { cursor: "pointer" } }}
+                  >
                     <Title order={5}>{routeName}</Title>
                   </Grid.Col>
-                  <Grid.Col span={3} offset={3}>
-                    <Link
-                      to={`${routeName}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <ActionIcon color="gray">
-                        <IconExternalLink />
-                      </ActionIcon>
-                    </Link>
-                  </Grid.Col>
-                  <Grid.Col span={3}>
-                    <Button
-                      variant="light"
-                      color="gray"
-                      onClick={() => {
-                        setRouteNameToEdit(routeName);
-                        openEditPositionModal();
-                      }}
-                    >
-                      {routes[routeName].position}
-                    </Button>
-                  </Grid.Col>
-                  <Grid.Col span={3}>
+                  <Grid.Col span={2}>
                     <Menu shadow="sm" width={200}>
                       <Menu.Target>
                         <ActionIcon color="gray">
@@ -163,9 +142,6 @@ const Routes = () => {
                       </Menu.Target>
 
                       <Menu.Dropdown>
-                        <Menu.Item onClick={() => deleteRoute(routeName)}>
-                          Delete
-                        </Menu.Item>
                         <Menu.Item
                           onClick={() =>
                             duplicateRoute({
@@ -175,6 +151,21 @@ const Routes = () => {
                           }
                         >
                           Duplicate
+                        </Menu.Item>
+                        <Menu.Item
+                          onClick={() => {
+                            setRouteNameToEdit(routeName);
+                            openEditPositionModal();
+                          }}
+                          rightSection={<Box>{routes[routeName].position}</Box>}
+                        >
+                          Update Position
+                        </Menu.Item>
+                        <Menu.Item
+                          color="red"
+                          onClick={() => deleteRoute(routeName)}
+                        >
+                          Delete
                         </Menu.Item>
                       </Menu.Dropdown>
                     </Menu>

@@ -10,7 +10,8 @@ import {
 } from "@mantine/core";
 import { useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useUpdateEffect } from "usehooks-ts";
 import { useEditRoute } from "../../apis/routesApis";
 import { usePokemonStore, useRouteStore } from "../../stores";
 import { AreaLevels, Encounters } from "../../types";
@@ -36,11 +37,25 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
   const [wildEncounters, setWildEncounters] = useState<Encounters>(
     {} as Encounters
   );
+  const viewport: any = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    return viewport.current.scrollTo({
+      top: viewport.current.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   const addPokemonToEncountertype = () => {
     setWildEncounters((wildEncounters: Encounters) => {
       let encounterType = currentEncountertype;
-      if (currentEncountertype === "special-encounter") {
+      if (
+        currentEncountertype === "special-encounter" ||
+        currentEncountertype === "legendary-encounter"
+      ) {
+        encounterType = `${currentEncountertype} ${specialEncounterArea}`;
+      }
+      if (currentEncountertype === "other") {
         encounterType = specialEncounterArea;
       }
 
@@ -95,9 +110,13 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
     setAreaLevels(routes[routeName]?.wild_encounters_area_levels || {});
   }, [routeName]);
 
+  useUpdateEffect(() => {
+    scrollToBottom();
+  }, [wildEncounters]);
+
   return (
     <>
-      <Grid mt={5}>
+      <Grid mt={5} mb={10}>
         <Grid.Col span={2}>
           <NativeSelect
             label="Encounter Type"
@@ -108,18 +127,23 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
               "grass-normal",
               "grass-doubles",
               "grass-special",
+              "sand-normal",
               "surf-normal",
               "surf-special",
               "fishing-normal",
               "fishing-special",
               "cave-normal",
               "cave-special",
+              "legendary-encounter",
               "special-encounter",
+              "other",
             ]}
           />
         </Grid.Col>
-        {currentEncountertype === "special-encounter" && (
-          <Grid.Col>
+        {(currentEncountertype === "special-encounter" ||
+          currentEncountertype === "legendary-encounter" ||
+          currentEncountertype === "other") && (
+          <Grid.Col span={2}>
             <TextInput
               label="Special Encounter Area"
               value={specialEncounterArea}
@@ -154,7 +178,10 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
           </Button>
         </Grid.Col>
       </Grid>
-      <ScrollArea.Autosize mah={800}>
+      <Button fullWidth mt={20} mb={20} onClick={() => submitWildEncounters()}>
+        Submit Wild Encounters
+      </Button>
+      <ScrollArea.Autosize mah={800} offsetScrollbars viewportRef={viewport}>
         {!isNullEmptyOrUndefined(wildEncounters) &&
           Object.keys(wildEncounters).map((encounterType, index) => {
             return (
@@ -163,7 +190,7 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
                   {capitalize(encounterType)} Encounters{" "}
                 </Title>
                 <TextInput
-                  placeholder="Level Range. Eg.'lv 1-5'"
+                  placeholder="Level Range. Eg.'20 - 30'"
                   mt={10}
                   sx={{ width: "12rem" }}
                   value={areaLevels[encounterType] || ""}
@@ -197,9 +224,6 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
             );
           })}
       </ScrollArea.Autosize>
-      <Button fullWidth mt={20} onClick={() => submitWildEncounters()}>
-        Submit Wild Encounters
-      </Button>
     </>
   );
 };

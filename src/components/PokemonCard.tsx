@@ -6,11 +6,12 @@ import {
   Card,
   Grid,
   Modal,
+  MultiSelect,
   Title,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   useAbilityStore,
   useItemsStore,
@@ -51,14 +52,17 @@ const PokemonCard = ({
   const itemsList = useItemsStore((state) => state.itemsList);
 
   const [opened, { open, close }] = useDisclosure(false);
-  const [item, setItem] = useInputState<string>("");
-  const [nature, setNature] = useInputState<string>("");
-  const [ability, setAbility] = useInputState<string>("");
+  const [item, setItem] = useInputState<string>("?");
+  const [nature, setNature] = useInputState<string>("?");
+  const [ability, setAbility] = useInputState<string>("?");
+  const [trainerVersionsPokemonBelongsTo, setTrainerVersionsPokemonBelongsTo] =
+    useInputState<string[]>([]);
+  const [trainerVersions, setTrainerVersions] = useState<string[]>([]);
   const [pokemonMoves, setPokemonMoves] = useInputState<string[]>([
-    "",
-    "",
-    "",
-    "",
+    "?",
+    "?",
+    "?",
+    "?",
   ]);
 
   const handleMoveChange = (index: number, value: string) => {
@@ -81,6 +85,7 @@ const PokemonCard = ({
                 nature,
                 ability,
                 moves: pokemonMoves.filter((m) => m !== ""),
+                trainer_version: trainerVersionsPokemonBelongsTo,
               };
             }
             return p;
@@ -100,12 +105,14 @@ const PokemonCard = ({
         setItem(pokemon.item);
         setNature(pokemon.nature);
         setAbility(pokemon.ability);
+        setTrainerVersionsPokemonBelongsTo(pokemon.trainer_version);
         if (pokemon.moves) {
           while (pokemon.moves?.length < 4) {
             pokemon.moves.push("");
           }
           setPokemonMoves(pokemon.moves);
         }
+        setTrainerVersions(trainers[trainerName].trainer_versions || []);
       }
     }
   }, [pokemonName]);
@@ -189,7 +196,7 @@ const PokemonCard = ({
               label="Held Item"
               value={item}
               onChange={setItem}
-              data={itemsList}
+              data={[...itemsList, "?"]}
               dropdownPosition={"bottom"}
               sx={{ zIndex: 10 }}
             />
@@ -197,7 +204,7 @@ const PokemonCard = ({
               label="Ability"
               value={ability}
               onChange={setAbility}
-              data={abilityList}
+              data={[...abilityList, "?"]}
             />
           </Grid.Col>
           <Grid.Col span={6}>
@@ -205,8 +212,14 @@ const PokemonCard = ({
               label="Nature"
               value={nature}
               onChange={setNature}
-              data={naturesList}
+              data={[...naturesList, "?"]}
               dropdownPosition={"bottom"}
+            />
+            <MultiSelect
+              label="The trainer version this pokemon belongs to"
+              value={trainerVersionsPokemonBelongsTo}
+              onChange={setTrainerVersionsPokemonBelongsTo}
+              data={trainerVersions}
             />
           </Grid.Col>
         </Grid>
@@ -218,7 +231,7 @@ const PokemonCard = ({
               key={index}
               value={move}
               onChange={(value: string) => handleMoveChange(index, value)}
-              data={movesList}
+              data={[...movesList, "?"]}
               dropdownPosition="bottom"
             />
           );

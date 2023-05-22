@@ -54,7 +54,7 @@ export type TrainerOrWildPokemon = {
   ability?: string;
   encounter_rate?: number;
   area_level?: number;
-  // rival_version?: string[];
+  trainer_version?: string[];
 };
 
 export type Encounters = {
@@ -65,8 +65,7 @@ export type TrainerInfo = {
   is_important: boolean;
   pokemon: TrainerOrWildPokemon[];
   sprite_name: string;
-  // is_rival?: boolean;
-  // rival_versions?: string[];
+  trainer_versions?: string[];
 };
 
 export type Trainers = {
