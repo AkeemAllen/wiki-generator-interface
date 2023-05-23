@@ -71,6 +71,7 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
         ],
       };
     });
+    submitWildEncounters();
     setPokemonName("");
   };
 
@@ -90,6 +91,7 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
       }
       return currentEncounters;
     });
+    submitWildEncounters();
   };
 
   const { mutate: submitWildEncounters } = useEditRoute({
@@ -178,9 +180,9 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
           </Button>
         </Grid.Col>
       </Grid>
-      <Button fullWidth mt={20} mb={20} onClick={() => submitWildEncounters()}>
+      {/* <Button fullWidth mt={20} mb={20} onClick={() => submitWildEncounters()}>
         Submit Wild Encounters
-      </Button>
+      </Button> */}
       <ScrollArea.Autosize mah={800} offsetScrollbars viewportRef={viewport}>
         {!isNullEmptyOrUndefined(wildEncounters) &&
           Object.keys(wildEncounters).map((encounterType, index) => {

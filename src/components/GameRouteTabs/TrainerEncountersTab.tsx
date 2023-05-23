@@ -2,7 +2,6 @@ import {
   ActionIcon,
   Autocomplete,
   Button,
-  Center,
   Checkbox,
   Grid,
   Menu,
@@ -12,7 +11,6 @@ import {
   ScrollArea,
   TextInput,
   Title,
-  Tooltip,
 } from "@mantine/core";
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -24,11 +22,102 @@ import { TrainerInfo, Trainers } from "../../types";
 import { capitalize, isNullEmptyOrUndefined } from "../../utils";
 import PokemonCard from "../PokemonCard";
 
-type ModalProps = {
+type TrainerMenuProps = {
+  trainerName: string;
+  trainerInfo: TrainerInfo;
+  functions: {
+    updateTrainer: (trainerName: string, trainerInfo: TrainerInfo) => void;
+    openSpriteModal: () => void;
+    openTrainerVersionsModal: () => void;
+    setTrainerVersions: React.Dispatch<React.SetStateAction<string[]>>;
+    setTrainerToUpdate: React.Dispatch<
+      React.SetStateAction<{
+        trainerName: string;
+        info: TrainerInfo;
+      }>
+    >;
+  };
+};
+
+const TrainerMenu = ({
+  trainerInfo,
+  trainerName,
+  functions,
+}: TrainerMenuProps) => {
+  const {
+    updateTrainer,
+    setTrainerToUpdate,
+    setTrainerVersions,
+    openSpriteModal,
+    openTrainerVersionsModal,
+  } = functions;
+  return (
+    <Menu shadow="sm" width={200} position="right-start">
+      <Menu.Target>
+        <ActionIcon mt={15} ml={10}>
+          <IconDots />
+        </ActionIcon>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Item
+          closeMenuOnClick={false}
+          rightSection={
+            <Checkbox
+              mr={10}
+              size={"xs"}
+              checked={trainerInfo.is_important}
+              onChange={() => {
+                updateTrainer(trainerName, {
+                  ...trainerInfo,
+                  is_important: !trainerInfo.is_important,
+                });
+              }}
+            />
+          }
+        >
+          Important Trainer
+        </Menu.Item>
+        {trainerInfo?.is_important && (
+          <>
+            <Menu.Item
+              onClick={() => {
+                setTrainerToUpdate({
+                  trainerName,
+                  info: trainerInfo,
+                });
+                openSpriteModal();
+              }}
+            >
+              Update Sprite
+            </Menu.Item>
+            <Menu.Item
+              onClick={() => {
+                setTrainerToUpdate({
+                  trainerName,
+                  info: trainerInfo,
+                });
+                setTrainerVersions((versions) => [
+                  ...versions,
+                  ...(trainerInfo?.trainer_versions || []),
+                ]);
+                openTrainerVersionsModal();
+              }}
+            >
+              Modify Trainer Versions
+            </Menu.Item>
+          </>
+        )}
+      </Menu.Dropdown>
+    </Menu>
+  );
+};
+
+type TabProps = {
   routeName: string;
 };
 
-const TrainersEncounterTab = ({ routeName }: ModalProps) => {
+const TrainersEncounterTab = ({ routeName }: TabProps) => {
   const pokemonList = usePokemonStore((state) => state.pokemonList);
   const routes = useRouteStore((state) => state.routes);
   const setRoutes = useRouteStore((state) => state.setRoutes);
@@ -39,9 +128,9 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
   const [level, setLevel] = useState<number>(0);
   const [trainers, setTrainers] = useState<Trainers>({} as Trainers);
   const [trainerToUpdate, setTrainerToUpdate] = useState<{
-    trainer: string;
+    trainerName: string;
     info: TrainerInfo;
-  }>({ trainer: "", info: {} as TrainerInfo });
+  }>({ trainerName: "", info: {} as TrainerInfo });
 
   const [
     spriteModalOpened,
@@ -53,70 +142,38 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
     { close: closeTrainerVersionsModal, open: openTrainerVersionsModal },
   ] = useDisclosure(false);
 
+  const updateTrainer = (trainerName: string, trainerInfo: TrainerInfo) => {
+    setTrainers((trainers: Trainers) => {
+      return { ...trainers, [trainerName]: trainerInfo };
+    });
+    submitTrainers();
+  };
+
   const addPokemonToTrainer = () => {
-    setTrainers((trainers: Trainers) => {
-      let sprite_name = "";
-      let is_important = false;
-      let existingPokemon = trainers[currentTrainer]?.pokemon ?? [];
+    let sprite_name = "";
+    let is_important = false;
+    let existingPokemon = trainers[currentTrainer]?.pokemon ?? [];
+    let trainer_versions = trainers[currentTrainer]?.trainer_versions ?? [];
 
-      if (!isNullEmptyOrUndefined(trainers[currentTrainer]?.sprite_name)) {
-        sprite_name = trainers[currentTrainer]?.sprite_name;
-      }
-      if (!isNullEmptyOrUndefined(trainers[currentTrainer]?.is_important)) {
-        is_important = trainers[currentTrainer]?.is_important;
-      }
+    if (!isNullEmptyOrUndefined(trainers[currentTrainer]?.sprite_name)) {
+      sprite_name = trainers[currentTrainer]?.sprite_name;
+    }
+    if (!isNullEmptyOrUndefined(trainers[currentTrainer]?.is_important)) {
+      is_important = trainers[currentTrainer]?.is_important;
+    }
 
-      return {
-        ...trainers,
-        [currentTrainer]: {
-          sprite_name,
-          is_important,
-          pokemon: [
-            ...existingPokemon,
-            {
-              name: pokemonName,
-              id: pokemonList?.find((p) => p.name === pokemonName)?.id,
-              level,
-            },
-          ],
+    updateTrainer(currentTrainer, {
+      sprite_name,
+      is_important,
+      trainer_versions,
+      pokemon: [
+        ...existingPokemon,
+        {
+          name: pokemonName,
+          id: pokemonList?.find((p) => p.name === pokemonName)?.id,
+          level,
         },
-      };
-    });
-  };
-
-  const addVersionsToTrainer = (versions: string[]) => {
-    setTrainers((trainers: Trainers) => {
-      return {
-        ...trainers,
-        [trainerToUpdate.trainer]: {
-          ...trainers[trainerToUpdate.trainer],
-          trainer_versions: versions,
-        },
-      };
-    });
-  };
-
-  const updateTrainerImportance = (trainer: string, isImportant: boolean) => {
-    setTrainers((trainers: Trainers) => {
-      return {
-        ...trainers,
-        [trainer]: {
-          ...trainers[trainer],
-          is_important: isImportant,
-        },
-      };
-    });
-  };
-
-  const updateTrainerSprite = (sprite_name: string) => {
-    setTrainers((trainers: Trainers) => {
-      return {
-        ...trainers,
-        [trainerToUpdate.trainer]: {
-          ...trainers[trainerToUpdate.trainer],
-          sprite_name,
-        },
-      };
+      ],
     });
   };
 
@@ -134,6 +191,7 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
       delete currentTrainers[trainer];
     }
     setTrainers(currentTrainers);
+    submitTrainers();
   };
 
   const { mutate: submitTrainers } = useEditRoute({
@@ -193,69 +251,32 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
           </Button>
         </Grid.Col>
       </Grid>
+      {/* <Button fullWidth mt={20} mb={20} onClick={() => submitTrainers()}>
+        Submit Trainers
+      </Button> */}
       <ScrollArea.Autosize mah={800}>
         {!isNullEmptyOrUndefined(trainers) &&
           Object.keys(trainers).map((trainer, index) => {
             return (
               <div key={index}>
                 <Grid columns={36}>
-                  <Grid.Col span={1}>
-                    <Tooltip label="Important Trainer">
-                      <Checkbox
-                        mt={24}
-                        size={"xs"}
-                        checked={trainers[trainer].is_important}
-                        onChange={() => {
-                          updateTrainerImportance(
-                            trainer,
-                            !trainers[trainer].is_important
-                          );
-                        }}
-                      />
-                    </Tooltip>
+                  <Grid.Col span={2}>
+                    <Title order={4} mt={20}>
+                      {capitalize(trainer)}
+                    </Title>
                   </Grid.Col>
                   <Grid.Col span={4}>
-                    <Center>
-                      <Title order={4} mt={20}>
-                        {capitalize(trainer)}
-                      </Title>
-                      <Menu shadow="sm" width={200} position="right-start">
-                        <Menu.Target>
-                          <ActionIcon mt={15} ml={10}>
-                            <IconDots />
-                          </ActionIcon>
-                        </Menu.Target>
-
-                        <Menu.Dropdown>
-                          <Menu.Item
-                            onClick={() => {
-                              setTrainerToUpdate({
-                                trainer,
-                                info: trainers[trainer],
-                              });
-                              openSpriteModal();
-                            }}
-                          >
-                            Update Sprite
-                          </Menu.Item>
-                          <Menu.Item
-                            onClick={() => {
-                              setTrainerToUpdate({
-                                trainer,
-                                info: trainers[trainer],
-                              });
-                              setTrainerVersions((versions) => [
-                                ...versions,
-                                ...(trainers[trainer]?.trainer_versions || []),
-                              ]);
-                              openTrainerVersionsModal();
-                            }}
-                          >
-                            Modify Trainer Versions
-                          </Menu.Item>
-                        </Menu.Dropdown>
-                      </Menu>
-                    </Center>
+                    <TrainerMenu
+                      trainerName={trainer}
+                      trainerInfo={trainers[trainer]}
+                      functions={{
+                        updateTrainer,
+                        openSpriteModal,
+                        openTrainerVersionsModal,
+                        setTrainerToUpdate,
+                        setTrainerVersions,
+                      }}
+                    />
                   </Grid.Col>
                 </Grid>
                 {trainers[trainer].is_important && (
@@ -290,9 +311,7 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
             );
           })}
       </ScrollArea.Autosize>
-      <Button fullWidth mt={20} onClick={() => submitTrainers()}>
-        Submit Trainers
-      </Button>
+
       <Modal
         opened={spriteModalOpened}
         onClose={closeSpriteModal}
@@ -302,13 +321,16 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
         <TextInput
           label="Use the names for the sprites found here: https://play.pokemonshowdown.com/sprites/trainers/"
           placeholder="Set a sprite name"
-          defaultValue={trainers[trainerToUpdate.trainer]?.sprite_name}
+          defaultValue={trainers[trainerToUpdate.trainerName]?.sprite_name}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               const { value } = e.target as HTMLInputElement;
               e.preventDefault();
               e.stopPropagation();
-              updateTrainerSprite(value);
+              updateTrainer(trainerToUpdate.trainerName, {
+                ...trainerToUpdate.info,
+                sprite_name: value,
+              });
               notifications.show({
                 message: "Sprite name updated successfully",
               });
@@ -326,8 +348,13 @@ const TrainersEncounterTab = ({ routeName }: ModalProps) => {
         <MultiSelect
           label="Trainer Versions"
           data={trainerVersions}
-          value={trainers[trainerToUpdate?.trainer]?.trainer_versions}
-          onChange={(value) => addVersionsToTrainer(value)}
+          value={trainers[trainerToUpdate?.trainerName]?.trainer_versions}
+          onChange={(value) =>
+            updateTrainer(trainerToUpdate.trainerName, {
+              ...trainerToUpdate.info,
+              trainer_versions: value,
+            })
+          }
           searchable
           creatable
           getCreateLabel={(query) => `Create trainer version "${query}"`}
