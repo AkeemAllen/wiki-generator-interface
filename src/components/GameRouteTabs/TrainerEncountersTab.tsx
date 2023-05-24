@@ -292,7 +292,6 @@ const TrainersEncounterTab = ({ routeName }: TabProps) => {
                         <PokemonCard
                           trainers={trainers}
                           trainerName={trainer}
-                          setTrainers={setTrainers}
                           pokemonId={pokemon.id as number}
                           pokemonName={pokemon.name as string}
                           removePokemon={() =>
@@ -302,6 +301,7 @@ const TrainersEncounterTab = ({ routeName }: TabProps) => {
                             )
                           }
                           level={pokemon.level as number}
+                          updateTrainer={updateTrainer}
                         />
                       </Grid.Col>
                     );
