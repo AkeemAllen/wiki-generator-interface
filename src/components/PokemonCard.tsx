@@ -109,7 +109,7 @@ const PokemonCardModal = ({
       <Grid>
         {pokemonMoves.map((move, index) => {
           return (
-            <Grid.Col span={6}>
+            <Grid.Col key={index} span={6}>
               <Autocomplete
                 placeholder="<empty>"
                 key={index}
@@ -161,7 +161,12 @@ const PokemonCard = ({
   const [trainerVersionsPokemonBelongsTo, setTrainerVersionsPokemonBelongsTo] =
     useInputState<string[]>([]);
   const [trainerVersions, setTrainerVersions] = useState<string[]>([]);
-  const [pokemonMoves, setPokemonMoves] = useInputState<string[]>([]);
+  const [pokemonMoves, setPokemonMoves] = useInputState<string[]>([
+    "",
+    "",
+    "",
+    "",
+  ]);
 
   const updatePokemon = () => {
     updateTrainer(trainerName, {

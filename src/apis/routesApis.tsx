@@ -118,3 +118,19 @@ export const useDuplicateRoute = (onSuccess: (data: any) => void) => {
     onSuccess,
   });
 };
+
+export const useUpdateRoutePositions = (onSuccess: (data: any) => void) => {
+  return useMutation({
+    mutationFn: (organizeRoutesList: string[]) => {
+      return fetch(
+        `${import.meta.env.VITE_BASE_URL}/game-route/edit-route-positions`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(organizeRoutesList),
+          headers: { "Content-Type": "application/json" },
+        }
+      ).then((res) => res.json());
+    },
+    onSuccess,
+  });
+};

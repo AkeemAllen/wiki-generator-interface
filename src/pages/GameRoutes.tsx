@@ -5,7 +5,6 @@ import {
   Grid,
   Menu,
   Modal,
-  NumberInput,
   TextInput,
   Title,
   createStyles,
@@ -13,14 +12,13 @@ import {
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconDotsVertical, IconPlus } from "@tabler/icons-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useAddNewRoute,
   useDeleteRoute,
   useDuplicateRoute,
-  useUpdateRoutePosition,
 } from "../apis/routesApis";
+import OrganizeRoutesModal from "../components/OrganizeRoutesModal";
 import { useRouteStore } from "../stores";
 
 type RouteNameModalProps = {
@@ -68,20 +66,18 @@ const useStyles = createStyles((theme) => ({
 const Routes = () => {
   const { classes } = useStyles();
   const [newRouteName, setNewRouteName] = useInputState<string>("");
-  const [newPosition, setNewPosition] = useState<number>(0);
   const [
     newRouteNameModalOpen,
     { open: openNewRouteNameModal, close: closeNewRouteNameModal },
   ] = useDisclosure(false);
-  const [routeNameToEdit, setRouteNameToEdit] = useState("");
   const [
-    editPositionModalOpen,
-    { open: openEditPositionModal, close: closeEditPositionModal },
+    organizeRouteModalOpen,
+    { open: openOrganizeRoutesModal, close: closeOrganizeRoutesModal },
   ] = useDisclosure(false);
   const navigate = useNavigate();
 
-  const setRoutes = useRouteStore((state) => state.setRoutes);
   const routes = useRouteStore((state) => state.routes);
+  const setRoutes = useRouteStore((state) => state.setRoutes);
 
   const { mutate: addNewRoute } = useAddNewRoute((data) => {
     setRoutes(data.routes);
@@ -99,15 +95,6 @@ const Routes = () => {
     });
   });
 
-  const { mutate: updateRoutePosition } = useUpdateRoutePosition((data) => {
-    setRoutes(data.routes);
-    setNewPosition(0);
-    closeEditPositionModal();
-    notifications.show({
-      message: "Route position changed successfully!",
-    });
-  });
-
   const { mutate: duplicateRoute } = useDuplicateRoute((data) => {
     setRoutes(data.routes);
     notifications.show({
@@ -117,13 +104,20 @@ const Routes = () => {
 
   return (
     <>
-      <Button leftIcon={<IconPlus />} onClick={openNewRouteNameModal}>
-        Add Route
-      </Button>
-      <Grid mt={50}>
+      <Grid>
+        <Grid.Col span={2}>
+          <Button leftIcon={<IconPlus />} onClick={openNewRouteNameModal}>
+            Add Route
+          </Button>
+        </Grid.Col>
+        <Grid.Col span={2} onClick={openOrganizeRoutesModal}>
+          <Button>Organize Routes</Button>
+        </Grid.Col>
+      </Grid>
+      <Grid mt={50} className="draggable-list">
         {Object.keys(routes).map((routeName, index) => {
           return (
-            <Grid.Col key={index} span={3}>
+            <Grid.Col key={index} span={3} className="draggable-source">
               <Box className={classes.box}>
                 <Grid sx={{ alignItems: "center" }}>
                   <Grid.Col
@@ -153,15 +147,6 @@ const Routes = () => {
                           Duplicate
                         </Menu.Item>
                         <Menu.Item
-                          onClick={() => {
-                            setRouteNameToEdit(routeName);
-                            openEditPositionModal();
-                          }}
-                          rightSection={<Box>{routes[routeName].position}</Box>}
-                        >
-                          Update Position
-                        </Menu.Item>
-                        <Menu.Item
                           color="red"
                           onClick={() => deleteRoute(routeName)}
                         >
@@ -184,21 +169,12 @@ const Routes = () => {
         setRouteName={setNewRouteName}
       />
       <Modal
-        opened={editPositionModalOpen}
-        onClose={closeEditPositionModal}
+        opened={organizeRouteModalOpen}
         withCloseButton={false}
+        onClose={closeOrganizeRoutesModal}
+        size={500}
       >
-        <NumberInput
-          label="New Position"
-          value={newPosition}
-          onChange={(e: number) => setNewPosition(e)}
-        />
-        <Button
-          mt={20}
-          onClick={() => updateRoutePosition({ routeNameToEdit, newPosition })}
-        >
-          Save Position
-        </Button>
+        <OrganizeRoutesModal />
       </Modal>
     </>
   );

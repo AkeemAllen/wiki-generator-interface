@@ -15,7 +15,7 @@ import {
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconDots } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditRoute } from "../../apis/routesApis";
 import { usePokemonStore, useRouteStore } from "../../stores";
 import { TrainerInfo, Trainers } from "../../types";
@@ -131,16 +131,23 @@ const TrainersEncounterTab = ({ routeName }: TabProps) => {
     trainerName: string;
     info: TrainerInfo;
   }>({ trainerName: "", info: {} as TrainerInfo });
-
   const [
     spriteModalOpened,
     { close: closeSpriteModal, open: openSpriteModal },
   ] = useDisclosure(false);
-
   const [
     trainerVersionsModalOpened,
     { close: closeTrainerVersionsModal, open: openTrainerVersionsModal },
   ] = useDisclosure(false);
+
+  const viewport: any = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    return viewport.current.scrollTo({
+      top: viewport.current.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   const updateTrainer = (trainerName: string, trainerInfo: TrainerInfo) => {
     setTrainers((trainers: Trainers) => {
@@ -175,6 +182,7 @@ const TrainersEncounterTab = ({ routeName }: TabProps) => {
         },
       ],
     });
+    scrollToBottom();
   };
 
   const removePokemonFromTrainer = (pokemonName: string, trainer: string) => {
@@ -254,7 +262,7 @@ const TrainersEncounterTab = ({ routeName }: TabProps) => {
       {/* <Button fullWidth mt={20} mb={20} onClick={() => submitTrainers()}>
         Submit Trainers
       </Button> */}
-      <ScrollArea.Autosize mah={800}>
+      <ScrollArea.Autosize mah={800} offsetScrollbars viewportRef={viewport}>
         {!isNullEmptyOrUndefined(trainers) &&
           Object.keys(trainers).map((trainer, index) => {
             return (
