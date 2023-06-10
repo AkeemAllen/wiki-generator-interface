@@ -259,10 +259,11 @@ const TrainersEncounterTab = ({ routeName }: TabProps) => {
           </Button>
         </Grid.Col>
       </Grid>
-      {/* <Button fullWidth mt={20} mb={20} onClick={() => submitTrainers()}>
-        Submit Trainers
-      </Button> */}
-      <ScrollArea.Autosize mah={800} offsetScrollbars viewportRef={viewport}>
+      <ScrollArea.Autosize
+        mah={"calc(100vh - 300px)"}
+        offsetScrollbars
+        viewportRef={viewport}
+      >
         {!isNullEmptyOrUndefined(trainers) &&
           Object.keys(trainers).map((trainer, index) => {
             return (

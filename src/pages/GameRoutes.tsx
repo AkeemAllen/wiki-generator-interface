@@ -5,6 +5,7 @@ import {
   Grid,
   Menu,
   Modal,
+  ScrollArea,
   TextInput,
   Title,
   createStyles,
@@ -12,6 +13,8 @@ import {
 import { useDisclosure, useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconDotsVertical, IconPlus } from "@tabler/icons-react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useAddNewRoute,
@@ -19,6 +22,8 @@ import {
   useDuplicateRoute,
 } from "../apis/routesApis";
 import OrganizeRoutesModal from "../components/OrganizeRoutesModal";
+import { useMeasurePosition } from "../hooks/useMeasurePosition";
+import { usePositionReorder } from "../hooks/usePositionReorder";
 import { useRouteStore } from "../stores";
 
 type RouteNameModalProps = {
@@ -74,10 +79,13 @@ const Routes = () => {
     organizeRouteModalOpen,
     { open: openOrganizeRoutesModal, close: closeOrganizeRoutesModal },
   ] = useDisclosure(false);
+  const [searchTerm, setSearchTerm] = useInputState<string>("");
   const navigate = useNavigate();
 
   const routes = useRouteStore((state) => state.routes);
   const setRoutes = useRouteStore((state) => state.setRoutes);
+
+  const [order, updatePosition, updateOrder, setOrder] = usePositionReorder([]);
 
   const { mutate: addNewRoute } = useAddNewRoute((data) => {
     setRoutes(data.routes);
@@ -102,9 +110,25 @@ const Routes = () => {
     });
   });
 
+  useEffect(() => {
+    setOrder(
+      Object.keys(routes).map((routeName, index) => {
+        return {
+          routeName,
+          position: routes[routeName].position,
+        };
+      })
+    );
+    console.log("order", order);
+  }, [routes]);
+
+  useEffect(() => {
+    console.log("order", order);
+  }, [order]);
+
   return (
     <>
-      <Grid>
+      <Grid mb={50}>
         <Grid.Col span={2}>
           <Button leftIcon={<IconPlus />} onClick={openNewRouteNameModal}>
             Add Route
@@ -113,54 +137,82 @@ const Routes = () => {
         <Grid.Col span={2} onClick={openOrganizeRoutesModal}>
           <Button>Organize Routes</Button>
         </Grid.Col>
+        <Grid.Col span={2}>
+          <TextInput
+            placeholder="Route Name"
+            value={searchTerm}
+            onChange={setSearchTerm}
+          />
+        </Grid.Col>
       </Grid>
-      <Grid mt={50} className="draggable-list">
-        {Object.keys(routes).map((routeName, index) => {
-          return (
-            <Grid.Col key={index} span={3} className="draggable-source">
-              <Box className={classes.box}>
-                <Grid sx={{ alignItems: "center" }}>
-                  <Grid.Col
-                    span={10}
-                    onClick={() => navigate(`${routeName}`)}
-                    sx={{ "&:hover": { cursor: "pointer" } }}
-                  >
-                    <Title order={5}>{routeName}</Title>
-                  </Grid.Col>
-                  <Grid.Col span={2}>
-                    <Menu shadow="sm" width={200}>
-                      <Menu.Target>
-                        <ActionIcon color="gray">
-                          <IconDotsVertical />
-                        </ActionIcon>
-                      </Menu.Target>
+      <ScrollArea.Autosize mah={"calc(100vh - 200px)"}>
+        <Grid className="draggable-list">
+          {/* {order.map(
+            (route: { routeName: string; position: number }, index: number) => {
+              return (
+                <Grid.Col key={index} span={3}>
+                  <SingleRoute
+                    key={index}
+                    route={route}
+                    index={index}
+                    updatePosition={updatePosition}
+                    updateOrder={updateOrder}
+                  />
+                </Grid.Col>
+              );
+            }
+          )} */}
+          {Object.keys(routes)
+            .filter((routeName) =>
+              routeName.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((routeName, index) => {
+              return (
+                <Grid.Col key={index} span={3} className="draggable-source">
+                  <Box className={classes.box}>
+                    <Grid sx={{ alignItems: "center" }}>
+                      <Grid.Col
+                        span={10}
+                        onClick={() => navigate(`${routeName}`)}
+                        sx={{ "&:hover": { cursor: "pointer" } }}
+                      >
+                        <Title order={5}>{routeName}</Title>
+                      </Grid.Col>
+                      <Grid.Col span={2}>
+                        <Menu shadow="sm" width={200}>
+                          <Menu.Target>
+                            <ActionIcon color="gray">
+                              <IconDotsVertical />
+                            </ActionIcon>
+                          </Menu.Target>
 
-                      <Menu.Dropdown>
-                        <Menu.Item
-                          onClick={() =>
-                            duplicateRoute({
-                              routeName,
-                              newRouteName: `${routeName} copy`,
-                            })
-                          }
-                        >
-                          Duplicate
-                        </Menu.Item>
-                        <Menu.Item
-                          color="red"
-                          onClick={() => deleteRoute(routeName)}
-                        >
-                          Delete
-                        </Menu.Item>
-                      </Menu.Dropdown>
-                    </Menu>
-                  </Grid.Col>
-                </Grid>
-              </Box>
-            </Grid.Col>
-          );
-        })}
-      </Grid>
+                          <Menu.Dropdown>
+                            <Menu.Item
+                              onClick={() =>
+                                duplicateRoute({
+                                  routeName,
+                                  newRouteName: `${routeName} copy`,
+                                })
+                              }
+                            >
+                              Duplicate
+                            </Menu.Item>
+                            <Menu.Item
+                              color="red"
+                              onClick={() => deleteRoute(routeName)}
+                            >
+                              Delete
+                            </Menu.Item>
+                          </Menu.Dropdown>
+                        </Menu>
+                      </Grid.Col>
+                    </Grid>
+                  </Box>
+                </Grid.Col>
+              );
+            })}
+        </Grid>
+      </ScrollArea.Autosize>
       <RouteNameModal
         isOpen={newRouteNameModalOpen}
         close={closeNewRouteNameModal}
@@ -177,6 +229,51 @@ const Routes = () => {
         <OrganizeRoutesModal />
       </Modal>
     </>
+  );
+};
+
+type SingleRouteProps = {
+  route: { routeName: string; position: number };
+  index: number;
+  updatePosition: any;
+  updateOrder: any;
+};
+
+const SingleRoute = ({
+  index,
+  route,
+  updateOrder,
+  updatePosition,
+}: SingleRouteProps) => {
+  const { classes } = useStyles();
+  const [isDragging, setDragging] = useState(false);
+
+  const ref = useMeasurePosition((pos: number) => updatePosition(index, pos));
+  return (
+    <motion.div
+      drag={true}
+      onDragStart={() => setDragging(true)}
+      onDragEnd={() => setDragging(false)}
+      ref={ref}
+      initial={false}
+      layout
+      whileHover={{
+        scale: 1.03,
+        boxShadow: "0px 3px 3px rgba(0,0,0,0.15)",
+      }}
+      whileTap={{
+        scale: 1.12,
+        boxShadow: "0px 5px 5px rgba(0,0,0,0.1)",
+      }}
+      onViewportEnter={() => {
+        isDragging && updateOrder(index);
+      }}
+      onViewportLeave={() => {
+        isDragging && updateOrder(index);
+      }}
+    >
+      <Box className={classes.box}>{route.routeName}</Box>
+    </motion.div>
   );
 };
 

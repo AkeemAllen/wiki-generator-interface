@@ -11,7 +11,6 @@ import {
 import { useInputState } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useRef, useState } from "react";
-import { useUpdateEffect } from "usehooks-ts";
 import { useEditRoute } from "../../apis/routesApis";
 import { usePokemonStore, useRouteStore } from "../../stores";
 import { AreaLevels, Encounters } from "../../types";
@@ -73,6 +72,7 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
     });
     submitWildEncounters();
     setPokemonName("");
+    scrollToBottom();
   };
 
   const removePokemonFromEncountertype = (
@@ -111,10 +111,6 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
     setWildEncounters(routes[routeName]?.wild_encounters || {});
     setAreaLevels(routes[routeName]?.wild_encounters_area_levels || {});
   }, [routeName]);
-
-  useUpdateEffect(() => {
-    scrollToBottom();
-  }, [wildEncounters]);
 
   return (
     <>
@@ -180,10 +176,11 @@ const WildEncountersTab = ({ routeName }: ModalProps) => {
           </Button>
         </Grid.Col>
       </Grid>
-      {/* <Button fullWidth mt={20} mb={20} onClick={() => submitWildEncounters()}>
-        Submit Wild Encounters
-      </Button> */}
-      <ScrollArea.Autosize mah={800} offsetScrollbars viewportRef={viewport}>
+      <ScrollArea.Autosize
+        mah={"calc(100vh - 300px)"}
+        offsetScrollbars
+        viewportRef={viewport}
+      >
         {!isNullEmptyOrUndefined(wildEncounters) &&
           Object.keys(wildEncounters).map((encounterType, index) => {
             return (
